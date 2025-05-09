@@ -127,11 +127,8 @@ class OrganisasiController extends Controller
     public function readWeb()
     {
         $allOrganisasi = Organisasi::all();
-<<<<<<< HEAD
         return view('admin.organisasi', ['organisasi' => $allOrganisasi]);
-=======
         return view('dashboard.admin', ['organisasi' => $allOrganisasi]);
->>>>>>> abcb99b34838138bd1d112b3b2aa725835eab98d
     }
 
     public function searchWeb(Request $request)
@@ -140,21 +137,15 @@ class OrganisasiController extends Controller
 
         $results = Organisasi::where('nama_organisasi', 'like', '%' . $search . '%')->get();
 
-<<<<<<< HEAD
         return view('admin.organisasi', ['organisasi' => $results]);
-=======
         return view('dashboard.admin', ['organisasi' => $results]);
->>>>>>> abcb99b34838138bd1d112b3b2aa725835eab98d
     }
 
     public function editWeb($id)
     {
         $organisasi = Organisasi::findOrFail($id);
-<<<<<<< HEAD
         return view('admin.organisasiEdit', ['organisasi' => $organisasi]);
-=======
         return view('dashboard.admin.edit', ['organisasi' => $organisasi]);
->>>>>>> abcb99b34838138bd1d112b3b2aa725835eab98d
     }
 
     public function updateWeb(Request $request, $id)
@@ -171,11 +162,8 @@ class OrganisasiController extends Controller
         $organisasi = Organisasi::findOrFail($id);
         $organisasi->update($validatedData);
 
-<<<<<<< HEAD
         return redirect()->route('admin.organisasi')->with('success', 'Data Organisasi berhasil diupdate!');
-=======
         return redirect()->route('dashboard.admin')->with('success', 'Data Organisasi berhasil diupdate!');
->>>>>>> abcb99b34838138bd1d112b3b2aa725835eab98d
     }
 
     public function deleteWeb($id)
@@ -183,10 +171,7 @@ class OrganisasiController extends Controller
         $organisasi = Organisasi::findOrFail($id);
         $organisasi->delete();
 
-<<<<<<< HEAD
         return redirect()->route('admin.organisasi')->with('success', 'Organisasi berhasil dihapus!');
-=======
         return redirect()->route('dashboard.admin')->with('success', 'Organisasi berhasil dihapus!');
->>>>>>> abcb99b34838138bd1d112b3b2aa725835eab98d
     }
 }

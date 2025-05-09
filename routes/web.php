@@ -32,6 +32,7 @@ Route::prefix('admin')->group(function () {
 
 Route::prefix('pembeli')->group(function () {
     Route::get('/alamat', [AlamatController::class, 'index'])->name('pembeli.alamat.index');
+    Route::post('/alamat/search', [AlamatController::class, 'search'])->name('pembeli.alamat.search');
     Route::post('/alamat/store', [AlamatController::class, 'store'])->name('pembeli.alamat.store');
     Route::get('/alamat/edit/{id}', [AlamatController::class, 'edit'])->name('pembeli.alamat.edit');
     Route::put('/alamat/update/{id}', [AlamatController::class, 'update'])->name('pembeli.alamat.update');

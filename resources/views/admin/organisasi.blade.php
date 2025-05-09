@@ -9,11 +9,9 @@
     <h2>Kelola Data Organisasi</h2>
 
     <!-- Form Search -->
-<<<<<<< HEAD
     <form method="GET" action="{{ route('admin.organisasi.search') }}">
-=======
+
     <form method="GET" action="{{ route('dashboard.admin.search') }}">
->>>>>>> abcb99b34838138bd1d112b3b2aa725835eab98d
         <input type="text" name="search" placeholder="Cari nama organisasi">
         <button type="submit">Cari</button>
     </form>
@@ -46,18 +44,16 @@
                     <td>{{ $org->status_organisasi }}</td>
                     <td>
                         <!-- Tombol Update -->
-<<<<<<< HEAD
                         <a href="{{ route('admin.organisasi.edit', $org->id_organisasi) }}">Edit</a>
 
                         
                         <!-- Tombol Delete -->
                         <form action="{{ route('admin.organisasi.delete', $org->id_organisasi) }}" method="POST" style="display:inline;">
-=======
+
                         <a href="{{ route('dashboard.admin.edit', $org->id_organisasi) }}">Edit</a>
                         
                         <!-- Tombol Delete -->
                         <form action="{{ route('dashboard.admin.delete', $org->id_organisasi) }}" method="POST" style="display:inline;">
->>>>>>> abcb99b34838138bd1d112b3b2aa725835eab98d
                             @csrf
                             @method('DELETE')
                             <button type="submit" onclick="return confirm('Yakin hapus?')">Hapus</button>
@@ -72,8 +68,7 @@
     @endif
 
 </body>
-<<<<<<< HEAD
+
 </html>
-=======
+
 </html>
->>>>>>> abcb99b34838138bd1d112b3b2aa725835eab98d
