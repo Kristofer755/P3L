@@ -18,11 +18,7 @@ class Pembeli extends Model
         'no_telp',
         'email',
         'password',
-<<<<<<< HEAD
-        // 'poin',
-=======
-        'poin',
->>>>>>> abcb99b34838138bd1d112b3b2aa725835eab98d
+        'poin', 
     ];
 
     public function alamat()
@@ -34,5 +30,4 @@ class Pembeli extends Model
     {   
         return $this->hasMany(Diskusi::class, 'id_pembeli', 'id_pembeli');
     }
-
 }
