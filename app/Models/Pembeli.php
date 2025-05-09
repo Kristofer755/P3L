@@ -18,7 +18,11 @@ class Pembeli extends Model
         'no_telp',
         'email',
         'password',
+<<<<<<< HEAD
         // 'poin',
+=======
+        'poin',
+>>>>>>> abcb99b34838138bd1d112b3b2aa725835eab98d
     ];
 
     public function alamat()

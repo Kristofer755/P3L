@@ -21,6 +21,10 @@ class PembeliController extends Controller
             'no_telp' => 'required|numeric',
             'password' => 'required|string|min:8|regex:/[A-Z]/|regex:/[0-9]/',
             'email' => 'required|email',
+<<<<<<< HEAD
+=======
+            'poin' => 'required|numeric',
+>>>>>>> abcb99b34838138bd1d112b3b2aa725835eab98d
         ]);
 
         $pembeli = Pembeli::create([
@@ -29,6 +33,10 @@ class PembeliController extends Controller
             'no_telp' => $validatedData['no_telp'],
             'password' => $validatedData['password'],
             'email' => $validatedData['email'],
+<<<<<<< HEAD
+=======
+            'poin' => $validatedData['poin'],
+>>>>>>> abcb99b34838138bd1d112b3b2aa725835eab98d
         ]);
 
         $user = User::create([
@@ -45,6 +53,7 @@ class PembeliController extends Controller
             'token' => $token,
         ], 201);
     }
+<<<<<<< HEAD
 
     public function storeWeb(Request $request)
     {
@@ -72,4 +81,6 @@ class PembeliController extends Controller
     {
         return view('register.pembeli');
     }
+=======
+>>>>>>> abcb99b34838138bd1d112b3b2aa725835eab98d
 }

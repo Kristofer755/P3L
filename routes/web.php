@@ -1,10 +1,18 @@
 <?php
 
+<<<<<<< HEAD
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginSessionController;
 use App\Http\Controllers\PembeliController;
 use App\Http\Controllers\AlamatController;
 use App\Http\Controllers\OrganisasiController;
+=======
+use App\Http\Controllers\AlamatController;
+use App\Http\Controllers\OrganisasiController;
+use Illuminate\Support\Facades\Route;
+
+use App\Http\Controllers\LoginSessionController;
+>>>>>>> abcb99b34838138bd1d112b3b2aa725835eab98d
 
 Route::get('/', function () {
     return redirect('/login');
@@ -22,6 +30,7 @@ Route::post('/register/organisasi', [OrganisasiController::class, 'storeWeb'])->
 // Route::post('admin/organisasi/edit/{id}', [OrganisasiController::class, 'updateWeb']);
 // Route::post('admin/organisasi/delete/{id}', [OrganisasiController::class, 'deleteWeb']);
 
+<<<<<<< HEAD
 Route::prefix('admin')->group(function () {
     Route::get('/organisasi', [OrganisasiController::class, 'readWeb'])->name('admin.organisasi.index');
     Route::get('/organisasi/search', [OrganisasiController::class, 'searchWeb'])->name('admin.organisasi.search');
@@ -51,6 +60,25 @@ Route::get('/admin/organisasi', function () {
 })->name('admin.organisasi');
 
 
+=======
+Route::prefix('admin/organisasi')->group(function () {
+    // Main dashboard view
+    Route::get('/', [OrganisasiController::class, 'readWeb'])->name('dashboard.admin');
+    
+    // Search functionality
+    Route::get('/search', [OrganisasiController::class, 'searchWeb'])->name('dashboard.admin.search');
+    
+    // Edit form 
+    Route::get('/edit/{id}', [OrganisasiController::class, 'editWeb'])->name('dashboard.admin.edit');
+    
+    // Update record
+    Route::post('/update/{id}', [OrganisasiController::class, 'updateWeb'])->name('dashboard.admin.update');
+    
+    // Delete record
+    Route::delete('/delete/{id}', [OrganisasiController::class, 'deleteWeb'])->name('dashboard.admin.delete');
+});
+
+>>>>>>> abcb99b34838138bd1d112b3b2aa725835eab98d
 Route::get('/register/alamat', [AlamatController::class, 'showForm']);
 Route::post('/register/alamat', [AlamatController::class, 'storeWeb']);
 
