@@ -1,18 +1,9 @@
 <?php
-
-<<<<<<< HEAD
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginSessionController;
 use App\Http\Controllers\PembeliController;
 use App\Http\Controllers\AlamatController;
 use App\Http\Controllers\OrganisasiController;
-=======
-use App\Http\Controllers\AlamatController;
-use App\Http\Controllers\OrganisasiController;
-use Illuminate\Support\Facades\Route;
-
-use App\Http\Controllers\LoginSessionController;
->>>>>>> abcb99b34838138bd1d112b3b2aa725835eab98d
 
 Route::get('/', function () {
     return redirect('/login');
@@ -25,12 +16,12 @@ Route::get('/dashboard', [LoginSessionController::class, 'dashboard'])->middlewa
 
 Route::get('/register/organisasi', [OrganisasiController::class, 'showForm'])->name('organisasi.form');
 Route::post('/register/organisasi', [OrganisasiController::class, 'storeWeb'])->name('organisasi.store');
+
 // Route::get('/admin/organisasi', [OrganisasiController::class, 'readWeb'])->name('admin.dashboard');
 // Route::get('/admin/organisasi/search', [OrganisasiController::class, 'searchWeb']);
 // Route::post('admin/organisasi/edit/{id}', [OrganisasiController::class, 'updateWeb']);
 // Route::post('admin/organisasi/delete/{id}', [OrganisasiController::class, 'deleteWeb']);
 
-<<<<<<< HEAD
 Route::prefix('admin')->group(function () {
     Route::get('/organisasi', [OrganisasiController::class, 'readWeb'])->name('admin.organisasi.index');
     Route::get('/organisasi/search', [OrganisasiController::class, 'searchWeb'])->name('admin.organisasi.search');
@@ -47,7 +38,6 @@ Route::prefix('pembeli')->group(function () {
     Route::delete('/alamat/delete/{id}', [AlamatController::class, 'destroy'])->name('pembeli.alamat.delete');
 });
 
-
 Route::get('/register/pembeli', [PembeliController::class, 'showForm'])->name('register.pembeli.form');
 Route::post('/register/pembeli', [PembeliController::class, 'storeWeb'])->name('register.pembeli.store');
 
@@ -59,8 +49,6 @@ Route::get('/admin/organisasi', function () {
     return view('admin.organisasi');
 })->name('admin.organisasi');
 
-
-=======
 Route::prefix('admin/organisasi')->group(function () {
     // Main dashboard view
     Route::get('/', [OrganisasiController::class, 'readWeb'])->name('dashboard.admin');
@@ -78,7 +66,6 @@ Route::prefix('admin/organisasi')->group(function () {
     Route::delete('/delete/{id}', [OrganisasiController::class, 'deleteWeb'])->name('dashboard.admin.delete');
 });
 
->>>>>>> abcb99b34838138bd1d112b3b2aa725835eab98d
 Route::get('/register/alamat', [AlamatController::class, 'showForm']);
 Route::post('/register/alamat', [AlamatController::class, 'storeWeb']);
 
