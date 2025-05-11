@@ -11,7 +11,7 @@
     <!-- Form Search -->
     <form method="GET" action="{{ route('admin.organisasi.search') }}">
 
-    <form method="GET" action="{{ route('dashboard.admin.search') }}">
+    <form method="GET" action="{{ route('admin.organisasi.search') }}">
         <input type="text" name="search" placeholder="Cari nama organisasi">
         <button type="submit">Cari</button>
     </form>
@@ -43,17 +43,14 @@
                     <td>{{ $org->password }}</td>
                     <td>{{ $org->status_organisasi }}</td>
                     <td>
-                        <!-- Tombol Update -->
-                        <a href="{{ route('admin.organisasi.edit', $org->id_organisasi) }}">Edit</a>
+                    
+                    <!-- Tombol Edit -->
+                    <a href="{{ route('admin.organisasi.edit', $org->id_organisasi) }}">
+                            <button type="button">Edit</button>
+                        </a>
 
-                        
                         <!-- Tombol Delete -->
                         <form action="{{ route('admin.organisasi.delete', $org->id_organisasi) }}" method="POST" style="display:inline;">
-
-                        <a href="{{ route('dashboard.admin.edit', $org->id_organisasi) }}">Edit</a>
-                        
-                        <!-- Tombol Delete -->
-                        <form action="{{ route('dashboard.admin.delete', $org->id_organisasi) }}" method="POST" style="display:inline;">
                             @csrf
                             @method('DELETE')
                             <button type="submit" onclick="return confirm('Yakin hapus?')">Hapus</button>

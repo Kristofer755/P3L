@@ -27,64 +27,52 @@
 
     <hr>
 
-    {{-- Form Tambah / Edit Penitip --}}
-    @if(isset($editMode) && $editMode)
-        <h2>Edit Penitip</h2>
-        <form action="{{ route('cs.penitip.update', $penitip->id_penitip) }}" method="POST" enctype="multipart/form-data">
-            @method('PUT')
-    @else
-        <h2>Tambah Penitip Baru</h2>
-        <form action="{{ route('cs.penitip.store') }}" method="POST" enctype="multipart/form-data">
-    @endif
-
+    {{-- Form Tambah Penitip Baru --}}
+    <h2>Tambah Penitip Baru</h2>
+    <form action="{{ route('cs.penitip.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div>
             <label>Nama Penitip:</label>
-            <input type="text" name="nama_penitip" value="{{ old('nama_penitip', $penitip->nama_penitip ?? '') }}" required>
+            <input type="text" name="nama_penitip" value="{{ old('nama_penitip') }}" required>
         </div>
 
         <div>
             <label>Email:</label>
-            <input type="email" name="email" value="{{ old('email', $penitip->email ?? '') }}" required>
+            <input type="email" name="email" value="{{ old('email') }}" required>
         </div>
 
         <div>
             <label>Password:</label>
-            <input type="password" name="password" {{ isset($editMode) && $editMode ? '' : 'required' }}>
+            <input type="password" name="password" required>
         </div>
 
         <div>
             <label>NIK (16 digit):</label>
-            <input type="text" name="NIK" maxlength="16" value="{{ old('NIK', $penitip->NIK ?? '') }}" required>
+            <input type="text" name="NIK" maxlength="16" value="{{ old('NIK') }}" required>
         </div>
 
         <div>
             <label>No. Telepon:</label>
-            <input type="text" name="no_telp" value="{{ old('no_telp', $penitip->no_telp ?? '') }}" required>
+            <input type="text" name="no_telp" value="{{ old('no_telp') }}" required>
         </div>
 
         <div>
             <label>Saldo:</label>
-            <input type="number" name="saldo" value="{{ old('saldo', $penitip->saldo ?? '') }}" required>
+            <input type="number" name="saldo" value="{{ old('saldo') }}" required>
         </div>
 
         <div>
             <label>Foto KTP:</label>
-            <input type="file" name="foto_ktp" {{ isset($editMode) && $editMode ? '' : 'required' }}>
-            @if(isset($penitip->foto_ktp))
-                <br>
-                <img src="{{ asset('storage/' . $penitip->foto_ktp) }}" width="100">
-            @endif
+            <input type="file" name="foto_ktp">
         </div>
 
-        <button type="submit">{{ isset($editMode) && $editMode ? 'Update' : 'Simpan' }}</button>
+        <button type="submit">Simpan</button>
     </form>
 
     <hr>
 
     {{-- Tabel Data Penitip --}}
     <h2>Daftar Penitip</h2>
-
     <table border="1" cellpadding="10">
         <thead>
             <tr>
@@ -99,7 +87,7 @@
             </tr>
         </thead>
         <tbody>
-            @forelse ($dataPenitip as $item)
+            @foreach ($penitip as $item)
                 <tr>
                     <td>{{ $item->id_penitip }}</td>
                     <td>{{ $item->nama_penitip }}</td>
@@ -123,9 +111,7 @@
                         </form>
                     </td>
                 </tr>
-            @empty
-                <tr><td colspan="8">Tidak ada data</td></tr>
-            @endforelse
+            @endforeach
         </tbody>
     </table>
 </body>

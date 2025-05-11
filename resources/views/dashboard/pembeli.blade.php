@@ -6,7 +6,7 @@
 <body>
     <h1>Selamat Datang di Dashboard Pembeli</h1>
     <form action="{{ route('pembeli.alamat') }}" method="get">
-        <button type="submit">Kelola Data Pembeli</button>
+        <button type="submit">Kelola Data Alamat</button>
     </form>
 </body>
 </html>

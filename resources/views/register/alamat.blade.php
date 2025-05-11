@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
     <title>Register Alamat</title>
@@ -56,4 +56,4 @@
         <button type="submit">Register Alamat</button>
     </form>
 </body>
-</html>
+</html> -->

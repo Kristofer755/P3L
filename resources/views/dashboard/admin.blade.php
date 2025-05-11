@@ -6,10 +6,9 @@
 <body>
     <h1>Selamat Datang di Dashboard Admin</h1>
 
-    <form action="{{ route('admin.organisasi') }}" method="get">
+    <form action="{{ route('admin.organisasi.index') }}" method="get">
         <button type="submit">Kelola Data Organisasi</button>
     </form>
-    <button type='submit'>Kelola Data Organisasi</button>
 
 </body>
 </html>

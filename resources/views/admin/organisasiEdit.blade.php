@@ -19,7 +19,7 @@
 
     <form action="{{ route('admin.organisasi.update', $organisasi->id_organisasi) }}" method="POST">
         @csrf
-        @method('POST')
+        @method('PUT')
 
         <label>Nama Organisasi:</label><br>
         <input type="text" name="nama_organisasi" value="{{ old('nama_organisasi', $organisasi->nama_organisasi) }}"><br><br>
@@ -38,14 +38,14 @@
 
         <label>Status:</label><br>
         <select name="status_organisasi">
-            <option value="aktif" {{ $organisasi->status_organisasi == 'aktif' ? 'selected' : '' }}>Aktif</option>
-            <option value="nonaktif" {{ $organisasi->status_organisasi == 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
+            <option value="aktif" {{ $organisasi->status_organisasi == 'Aktif' ? 'selected' : '' }}>Aktif</option>
+            <option value="nonaktif" {{ $organisasi->status_organisasi == 'Nonaktif' ? 'selected' : '' }}>Nonaktif</option>
         </select><br><br>
 
         <button type="submit">Update</button>
     </form>
 
     <br>
-    <a href="{{ route('admin.organisasi') }}">Kembali ke Dashboard</a>
+    <a href="{{ route('admin.organisasi.index') }}">Kembali ke Dashboard</a>
 </body>
 </html>
