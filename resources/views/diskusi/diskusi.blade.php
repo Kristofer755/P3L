@@ -17,9 +17,9 @@
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
-    {{-- Form Buat Diskusi --}}
+    {{-- Form Kirim Pesan --}}
     <div class="card mb-4">
-        <div class="card-header">Buat Diskusi Baru</div>
+        <div class="card-header">Kirim Pesan</div>
         <div class="card-body">
         @if ($errors->any())
             <div class="alert alert-danger">
@@ -43,61 +43,54 @@
                     </select>
                 </div>
                 <div class="form-group mt-2">
-                    <label for="judul_diskusi">Judul Diskusi</label>
-                    <input type="text" name="judul_diskusi" class="form-control" required>
+                    <label for="pesan">Pesan</label>
+                    <textarea name="pesan" class="form-control" rows="3" required></textarea>
                 </div>
-                <button type="submit" class="btn btn-success mt-3">Buat Diskusi</button>
+                <button type="submit" class="btn btn-success mt-3">Kirim Pesan</button>
             </form>
         </div>
     </div>
 
-    {{-- Daftar Diskusi --}}
+    {{-- Daftar Diskusi Berdasarkan Barang --}}
+    @foreach ($barangDenganDiskusi as $barang)
     <div class="card mb-4">
-        <div class="card-header">Daftar Diskusi</div>
+        <div class="card-header bg-primary text-white">
+            Diskusi Barang: {{ $barang->nama_barang }}
+        </div>
         <div class="card-body">
-        @foreach ($diskusi as $d)
-            <div class="border p-2 mb-2">
-                <strong>{{ $d->judul_diskusi }}</strong><br>
-                <small>Dibuat oleh:
-                    @if ($d->pembeli)
-                        {{ $d->pembeli->nama }}
-                    @elseif ($d->pegawai)
-                        {{ $d->pegawai->nama }} (CS)
-                    @endif
-                </small>
-                <a href="{{ route('diskusi.show', $d->id_diskusi) }}" class="btn btn-sm btn-primary float-end">Lihat</a>
+            <div class="mb-3">
+                <h5>Pesan-pesan:</h5>
+                @foreach ($barang->diskusi as $diskusi)
+                    <div class="border p-2 mb-2 {{ $diskusi->tipe_sender == 'pembeli' ? 'border-primary' : 'border-success' }}">
+                        <div class="d-flex justify-content-between">
+                            <strong>{{ $diskusi->nama_pengirim }}</strong>
+                            <small>{{ date('d/m/Y', strtotime($diskusi->tgl_diskusi)) }}</small>
+                        </div>
+                        <p class="mb-0 mt-2">{{ $diskusi->pesan }}</p>
+                    </div>
+                @endforeach
             </div>
-        @endforeach
+
+            {{-- Form Balas Pesan --}}
+            <form action="{{ route('diskusi.kirim') }}" method="POST">
+                @csrf
+                <input type="hidden" name="id_diskusi" value="{{ $barang->diskusi->last()->id_diskusi }}">
+                <div class="form-group">
+                    <label for="pesan">Balas Pesan</label>
+                    <textarea name="pesan" class="form-control" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary mt-2">Kirim Balasan</button>
+            </form>
         </div>
     </div>
+    @endforeach
 
-    {{-- Jika sedang melihat detail diskusi --}}
-    @isset($selectedDiskusi)
-        <div class="card">
-            <div class="card-header">Diskusi: {{ $selectedDiskusi->judul_diskusi }}</div>
-            <div class="card-body">
-                <div class="mb-4">
-                    <h5>Pesan</h5>
-                    @foreach ($selectedDiskusi->pesan as $pesan)
-                        <div class="border p-2 my-2">
-                            <strong>{{ ucfirst($pesan->tipe_sender) }} #{{ $pesan->id_sender }}:</strong>
-                            <p>{{ $pesan->pesan }}</p>
-                        </div>
-                    @endforeach
-                </div>
-
-                <form action="{{ route('diskusi.kirim') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="id_diskusi" value="{{ $selectedDiskusi->id_diskusi }}">
-                    <div class="form-group">
-                        <label for="pesan">Tulis Pesan</label>
-                        <textarea name="pesan" class="form-control" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary mt-2">Kirim Pesan</button>
-                </form>
-            </div>
+    {{-- Pesan jika tidak ada diskusi --}}
+    @if ($barangDenganDiskusi->isEmpty())
+        <div class="alert alert-info">
+            Belum ada diskusi. Silakan mulai diskusi dengan mengirim pesan pada formulir di atas.
         </div>
-    @endisset
+    @endif
 
 </div>
 </body>

@@ -14,7 +14,7 @@
         onclick="return confirm('Yakin reset password ke tanggal lahir?')"
         class="btn btn-warning">Reset Password</a>
 
-    <form action="{{ route('pembeli.diskusiCS') }}" method="get">
+    <form action="{{ route('diskusi.index') }}" method="get">
         <button type="submit">Diskusi Produk</button>
     </form>
 

@@ -9,7 +9,7 @@
         <button type="submit">Kelola Data Alamat</button>
     </form>
 
-    <form action="{{ route('pembeli.diskusiPembeli') }}" method="get">
+    <form action="{{ route('diskusi.index') }}" method="get">
         <button type="submit">Diskusi Produk</button>
     </form>
 </body>

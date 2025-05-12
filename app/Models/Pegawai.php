@@ -23,4 +23,9 @@ class Pegawai extends Model
         'status_pegawai',
         'tgl_lahir',
     ];
+
+    public function diskusi()
+    {
+        return $this->hasMany(DiskusiProduk::class, 'id_pegawai', 'id_pegawai');
+    }
 }

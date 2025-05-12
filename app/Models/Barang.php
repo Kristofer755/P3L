@@ -25,7 +25,7 @@ class Barang extends Model
 
     public function diskusi()
     {
-        return $this->hasMany(Diskusi::class, 'id_barang', 'id_barang');
+        return $this->hasMany(DiskusiProduk::class, 'id_barang', 'id_barang');
     }
 
 }
