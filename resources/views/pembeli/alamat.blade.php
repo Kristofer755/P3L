@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Manajemen Data Penitip</title>
+    <title>Manajemen Alamat Pembeli</title>
 </head>
 <body>
-    <h1>Kelola Data Penitip</h1>
+    <h1>Kelola Data Alamat</h1>
 
     {{-- Notifikasi --}}
     @if (session('success'))
@@ -20,61 +20,58 @@
     @endif
 
     {{-- Form Pencarian --}}
-    <form action="{{ route('cs.penitip.search') }}" method="GET">
-        <input type="text" name="search" placeholder="Cari Nama Penitip" value="{{ request('search') }}">
+    <form action="{{ route('pembeli.alamat.search') }}" method="GET">
+        <input type="text" name="search" placeholder="Cari Nama Alamat" value="{{ request('search') }}">
         <button type="submit">Cari</button>
     </form>
 
     <hr>
 
-    {{-- Form Tambah / Edit Penitip --}}
-    @if(isset($editMode) && $editMode)
-        <h2>Edit Penitip</h2>
-        <form action="{{ route('cs.penitip.update', $penitip->id_penitip) }}" method="POST" enctype="multipart/form-data">
+    {{-- Form Tambah / Edit Alamat --}}
+    @if(isset($editMode) && $editMode && isset($alamat))
+        <h2>Edit Alamat</h2>
+        <form action="{{ route('pembeli.alamat.update', $alamat->id_alamat) }}" method="POST">
             @method('PUT')
     @else
-        <h2>Tambah Penitip Baru</h2>
-        <form action="{{ route('cs.penitip.store') }}" method="POST" enctype="multipart/form-data">
+        <h2>Tambah Alamat Baru</h2>
+        <form action="{{ route('pembeli.alamat.store') }}" method="POST">
     @endif
 
         @csrf
         <div>
-            <label>Nama Penitip:</label>
-            <input type="text" name="nama_penitip" value="{{ old('nama_penitip', $penitip->nama_penitip ?? '') }}" required>
+            <label>Pembeli:</label>
+            <select name="id_pembeli" required>
+                <option value="">-- Pilih Pembeli --</option>
+                @foreach ($pembeliList as $pembeli)
+                    <option value="{{ $pembeli->id_pembeli }}" 
+                        {{ old('id_pembeli', $alamat->id_pembeli ?? '') == $pembeli->id_pembeli ? 'selected' : '' }}>
+                        {{ $pembeli->nama_pembeli }}
+                    </option>
+                @endforeach
+            </select>
         </div>
 
         <div>
-            <label>Email:</label>
-            <input type="email" name="email" value="{{ old('email', $penitip->email ?? '') }}" required>
+            <label>Nama Alamat:</label>
+            <input type="text" name="nama_alamat" value="{{ old('nama_alamat', $alamat->nama_alamat ?? '') }}" required>
         </div>
 
         <div>
-            <label>Password:</label>
-            <input type="password" name="password" {{ isset($editMode) && $editMode ? '' : 'required' }}>
+            <label>Detail Alamat:</label>
+            <textarea name="detail_alamat" required>{{ old('detail_alamat', $alamat->detail_alamat ?? '') }}</textarea>
         </div>
 
         <div>
-            <label>NIK (16 digit):</label>
-            <input type="text" name="NIK" maxlength="16" value="{{ old('NIK', $penitip->NIK ?? '') }}" required>
+            <label>Tipe Alamat:</label>
+            <input type="text" name="tipe_alamat" value="{{ old('tipe_alamat', $alamat->tipe_alamat ?? '') }}" required>
         </div>
 
         <div>
-            <label>No. Telepon:</label>
-            <input type="text" name="no_telp" value="{{ old('no_telp', $penitip->no_telp ?? '') }}" required>
-        </div>
-
-        <div>
-            <label>Saldo:</label>
-            <input type="number" name="saldo" value="{{ old('saldo', $penitip->saldo ?? '') }}" required>
-        </div>
-
-        <div>
-            <label>Foto KTP:</label>
-            <input type="file" name="foto_ktp" {{ isset($editMode) && $editMode ? '' : 'required' }}>
-            @if(isset($penitip->foto_ktp))
-                <br>
-                <img src="{{ asset('storage/' . $penitip->foto_ktp) }}" width="100">
-            @endif
+            <label>Status Default:</label>
+            <select name="status_default" required>
+                <option value="aktif" {{ old('status_default', $alamat->status_default ?? '') == 'aktif' ? 'selected' : '' }}>Aktif</option>
+                <option value="nonaktif" {{ old('status_default', $alamat->status_default ?? '') == 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
+            </select>
         </div>
 
         <button type="submit">{{ isset($editMode) && $editMode ? 'Update' : 'Simpan' }}</button>
@@ -82,49 +79,39 @@
 
     <hr>
 
-    {{-- Tabel Data Penitip --}}
-    <h2>Daftar Penitip</h2>
+    {{-- Tabel Alamat --}}
+    <h2>Daftar Alamat</h2>
 
     <table border="1" cellpadding="10">
         <thead>
             <tr>
-                <th>ID Penitip</th>
-                <th>Nama</th>
-                <th>Email</th>
-                <th>NIK</th>
-                <th>No Telp</th>
-                <th>Saldo</th>
-                <th>Foto KTP</th>
+                <th>ID</th>
+                <th>Nama Alamat</th>
+                <th>Detail</th>
+                <th>Tipe</th>
+                <th>Status</th>
                 <th>Aksi</th>
             </tr>
         </thead>
         <tbody>
-            @forelse ($dataPenitip as $item)
+            @forelse ($dataAlamat as $item)
                 <tr>
-                    <td>{{ $item->id_penitip }}</td>
-                    <td>{{ $item->nama_penitip }}</td>
-                    <td>{{ $item->email }}</td>
-                    <td>{{ $item->NIK }}</td>
-                    <td>{{ $item->no_telp }}</td>
-                    <td>{{ $item->saldo }}</td>
+                    <td>{{ $item->id_alamat }}</td>
+                    <td>{{ $item->nama_alamat }}</td>
+                    <td>{{ $item->detail_alamat }}</td>
+                    <td>{{ $item->tipe_alamat }}</td>
+                    <td>{{ ucfirst($item->status_default) }}</td>
                     <td>
-                        @if($item->foto_ktp)
-                            <img src="{{ asset('storage/' . $item->foto_ktp) }}" width="100">
-                        @else
-                            -
-                        @endif
-                    </td>
-                    <td>
-                        <a href="{{ route('cs.penitip.edit', $item->id_penitip) }}">Edit</a>
-                        <form action="{{ route('cs.penitip.delete', $item->id_penitip) }}" method="POST" style="display:inline;">
+                        <a href="{{ route('pembeli.alamat.edit', $item->id_alamat) }}">Edit</a> |
+                        <form action="{{ route('pembeli.alamat.delete', $item->id_alamat) }}" method="POST" style="display:inline;">
                             @csrf
                             @method('DELETE')
-                            <button onclick="return confirm('Yakin hapus?')" type="submit">Hapus</button>
+                            <button type="submit" onclick="return confirm('Yakin hapus?')">Hapus</button>
                         </form>
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="8">Tidak ada data</td></tr>
+                <tr><td colspan="7">Tidak ada data alamat</td></tr>
             @endforelse
         </tbody>
     </table>

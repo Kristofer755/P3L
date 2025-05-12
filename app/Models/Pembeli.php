@@ -30,4 +30,9 @@ class Pembeli extends Model
     {   
         return $this->hasMany(Diskusi::class, 'id_pembeli', 'id_pembeli');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_user', 'id');
+    }
 }

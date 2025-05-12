@@ -5,6 +5,9 @@ use App\Http\Controllers\PembeliController;
 use App\Http\Controllers\AlamatController;
 use App\Http\Controllers\OrganisasiController;
 use App\Http\Controllers\PenitipController;
+use App\Http\Controllers\PegawaiController;
+use App\Http\Controllers\DiskusiProdukController;
+use App\Http\Controllers\RequestDonasiController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -19,11 +22,6 @@ Route::get('/register/organisasi', [OrganisasiController::class, 'showForm'])->n
 Route::post('/register/organisasi', [OrganisasiController::class, 'storeWeb'])->name('organisasi.store');
 Route::get('/register/pembeli', [PembeliController::class, 'showForm'])->name('register.pembeli.form');
 Route::post('/register/pembeli', [PembeliController::class, 'storeWeb'])->name('register.pembeli.store');
-Route::get('/register/alamat', [AlamatController::class, 'showForm']);
-Route::post('/register/alamat', [AlamatController::class, 'storeWeb']);
-Route::get('/register/penitip', [PenitipController::class, 'showForm']);
-Route::post('/register/penitip', [PenitipController::class, 'storeWeb']);
-
 
 Route::prefix('admin')->group(function () {
     Route::get('/organisasi', [OrganisasiController::class, 'readWeb'])->name('admin.organisasi.index');
@@ -51,6 +49,16 @@ Route::prefix('cs')->group(function () {
     Route::delete('/penitip/delete/{id}', [PenitipController::class, 'deleteWeb'])->name('cs.penitip.delete');
 });
 
+Route::prefix('organisasi')->group(function () {
+    Route::get('/request', [RequestDonasiController::class, 'readWeb'])->name('organisasi.request.read');
+    Route::get('/request/search', [RequestDonasiController::class, 'searchWeb'])->name('organisasi.request.search');
+    Route::post('/request', [RequestDonasiController::class, 'storeWeb'])->name('organisasi.request.store');
+    Route::get('/request/{id}/edit', [RequestDonasiController::class, 'editWeb'])->name('organisasi.request.edit');
+    Route::put('/request/{id}', [RequestDonasiController::class, 'updateWeb'])->name('organisasi.request.update');
+    Route::delete('/request/{id}', [RequestDonasiController::class, 'deleteWeb'])->name('organisasi.request.delete');
+});
+
+
 Route::view('/dashboard/pembeli', 'dashboard.pembeli')->name('dashboard.pembeli');
 Route::view('/dashboard/penitip', 'dashboard.penitip')->name('dashboard.penitip');
 Route::view('/dashboard/admin', 'dashboard.admin')->name('dashboard.admin');
@@ -58,3 +66,39 @@ Route::view('/dashboard/gudang', 'dashboard.gudang')->name('dashboard.gudang');
 Route::view('/dashboard/owner', 'dashboard.owner')->name('dashboard.owner');
 Route::view('/dashboard/cs', 'dashboard.cs')->name('dashboard.cs');
 Route::view('/dashboard/organisasi', 'dashboard.organisasi')->name('dashboard.organisasi');
+
+Route::get('/pegawai/{id}/reset-password', [PegawaiController::class, 'resetPassword'])->name('pegawai.resetPassword');
+Route::get('/dashboard-admin', [PegawaiController::class, 'dashboardAdmin'])->name('dashboard.admin');
+Route::get('/dashboard/cs', [PegawaiController::class, 'dashboardCS'])->name('dashboard.cs');
+Route::get('/dashboard/owner', [PegawaiController::class, 'dashboardOwner'])->name('dashboard.owner');
+Route::get('/dashboard/gudang', [PegawaiController::class, 'dashboardGudang'])->name('dashboard.gudang');
+
+// Kirim link reset ke email
+Route::post('/pembeli/send-reset-link', [PembeliController::class, 'sendResetLink'])->name('pembeli.sendResetLink');
+
+// Tampilkan form reset password
+Route::get('/pembeli/reset-password-form', [PembeliController::class, 'showResetForm'])->name('pembeli.resetForm');
+
+// Proses reset password
+Route::post('/pembeli/reset-password', [PembeliController::class, 'resetPassword'])->name('pembeli.resetPassword');
+
+// Tampilkan form input email
+Route::get('/pembeli/request-reset', function () {
+    return view('pembeli.request-reset');
+})->name('pembeli.requestReset');
+
+Route::prefix('diskusi')->group(function () {
+    Route::get('/diskusi', [DiskusiProdukController::class, 'index'])->name('diskusi.index');
+    Route::get('/diskusi/create', [DiskusiProdukController::class, 'create'])->name('diskusi.create');
+    Route::post('/diskusi', [DiskusiProdukController::class, 'store'])->name('diskusi.store');
+    Route::get('/diskusi/{id_diskusi}', [DiskusiProdukController::class, 'show'])->name('diskusi.show');
+    Route::post('/diskusi/kirim', [DiskusiProdukController::class, 'kirimPesan'])->name('diskusi.kirim');
+});
+
+Route::get('/diskusi/cs', function () {
+    return view('diskusi.diskusiCS');
+})->name('pembeli.diskusiCS');
+
+Route::get('/diskusi/pembeli', function () {
+    return view('diskusi.diskusiPembeli');
+})->name('pembeli.diskusiPembeli');

@@ -6,27 +6,34 @@ use Illuminate\Database\Eloquent\Model;
 
 class DiskusiProduk extends Model
 {
-    protected $table = 'diskusi_produk';
-    protected $primaryKey = 'id_diskusi';
+    public $timestamps = false;
     public $incrementing = false;
     protected $keyType = 'string';
-    public $timestamps = false;
+    protected $table = 'diskusi_produk';
+    protected $primaryKey = 'id_diskusi';
 
     protected $fillable = [
         'id_diskusi',
-        'id_barang',
-        'id_pembeli',
-        'pesan',
+        'id_barang', 
+        'id_pembeli', 
+        'id_pegawai',
+        'judul_diskusi',
         'tgl_diskusi',
     ];
 
-    public function barang()
+    public function pesan()
     {
-        return $this->belongsTo(Barang::class, 'id_barang', 'id_barang');
+        return $this->hasMany(PesanDiskusi::class, 'id_diskusi');
     }
-
+    
     public function pembeli()
     {
-        return $this->belongsTo(Pembeli::class, 'id_pembeli', 'id_pembeli');
+        return $this->belongsTo(Pembeli::class, 'id_pembeli');
     }
+    
+    public function pegawai()
+    {
+        return $this->belongsTo(Pegawai::class, 'id_pegawai');
+    }
+       
 }

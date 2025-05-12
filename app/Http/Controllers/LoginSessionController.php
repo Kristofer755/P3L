@@ -93,4 +93,54 @@ class LoginSessionController extends Controller
 
         return redirect('/login');
     }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'id_barang' => 'required',
+            'judul_diskusi' => 'required|string',
+        ]);
+
+        $user = Session::get('user');
+    
+        $diskusi = DiskusiProduk::create([
+            'id_barang' => $request->id_barang,
+            'id_pembeli' => $user->id_pembeli, // karena hanya pembeli yang bisa buat diskusi
+            'judul_diskusi' => $request->judul_diskusi,
+        ]);
+    
+        return redirect()->route('diskusi.show', $diskusi->id_diskusi);
+    }
+    
+
+    public function kirimPesan(Request $request)
+    {
+        $request->validate([
+            'id_diskusi' => 'required',
+            'pesan' => 'required|string',
+        ]);
+    
+        $user = Session::get('user');
+    
+        // Cek apakah user adalah pembeli atau pegawai (CS)
+        if (property_exists($user, 'id_pembeli')) {
+            $senderType = 'pembeli';
+            $senderId = $user->id_pembeli;
+        } elseif (property_exists($user, 'id_pegawai')) {
+            $senderType = 'pegawai';
+            $senderId = $user->id_pegawai;
+        } else {
+            return back()->with('error', 'Role tidak dikenali');
+        }
+    
+        PesanDiskusi::create([
+            'id_diskusi' => $request->id_diskusi,
+            'sender_type' => $senderType,
+            'sender_id' => $senderId,
+            'pesan' => $request->pesan,
+        ]);
+    
+        return back()->with('success', 'Pesan dikirim!');
+    }
+    
 }

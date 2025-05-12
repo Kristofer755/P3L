@@ -25,5 +25,4 @@ class Alamat extends Model
     {
         return $this->belongsTo(Pembeli::class, 'id_pembeli', 'id_pembeli');
     }
-
 }

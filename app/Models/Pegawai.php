@@ -21,5 +21,6 @@ class Pegawai extends Model
         'no_telp',
         'jabatan',
         'status_pegawai',
+        'tgl_lahir',
     ];
 }

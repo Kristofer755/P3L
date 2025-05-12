@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\RequestDonasi;
 use App\Models\Organisasi; 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 
 class RequestDonasiController extends Controller
 {
@@ -16,66 +14,99 @@ class RequestDonasiController extends Controller
         return response()->json($allRequest);
     }
 
-    public function store(Request $request)
+    public function showForm()
+    {
+        $requestList = RequestDonasi::all(); // Ganti dari Request ke RequestDonasi
+        return view('organisasi.request', compact('requestList'));
+    }
+
+    public function storeWeb(Request $request)
     {
         $validatedData = $request->validate([
-            'id_request_donasi' => 'required|string',
             'id_organisasi' => 'required|exists:organisasi,id_organisasi',
             'deskripsi_request' => 'required|string',
-            'tgl_request' => 'required|date',
-            'status_request' => 'required|in:Diminta,Diterima,Ditolak,Selesai,Dikirim',
+            'status_request' => 'required|in:Diminta,Selesai,Diterima,Ditolak,Dikirim',
         ]);
 
-        $requestDonasi = RequestDonasi::create([
-            'id_request_donasi' => $validatedData['id_request_donasi'],
-            'id_organisasi' => $validatedData['id_organisasi'],
-            'deskripsi_request' => $validatedData['deskripsi_request'],
-            'tgl_request' => $validatedData['tgl_request'],
-            'status_request' => $validatedData['status_request'],
-        ]);
+        // Buat ID request otomatis
+        $lastNumber = RequestDonasi::selectRaw('MAX(CAST(SUBSTRING(id_request_donasi, 4) AS UNSIGNED)) as max_id')->value('max_id');
+        $newNumber = $lastNumber ? $lastNumber + 1 : 1;
+        $newId = 'REQ' . $newNumber;
 
-        return response()->json([
-            'message' => 'Request Donasi berhasil ditambahkan',
-            'request_donasi' => $requestDonasi,
-        ], 201);
+        // Tambahkan field yang sesuai dengan $fillable
+        $validatedData['id_request_donasi'] = $newId;
+        $validatedData['tgl_request'] = now()->toDateString();
+
+        RequestDonasi::create($validatedData);
+
+        return redirect()->back()->with('success', 'Donasi berhasil direquest!');
     }
 
-    public function update(Request $request, string $id)
+    public function readWeb()
+    {
+        $dataRequest = RequestDonasi::with('organisasi')->get(); 
+        $organisasiList = Organisasi::all();
+
+        return view('organisasi.request', [
+            'dataRequest' => $dataRequest,
+            'organisasiList' => $organisasiList,
+            'editMode' => false
+        ]);
+    }
+
+    public function searchWeb(Request $request)
+    {
+        $search = $request->input('search');
+
+        $results = RequestDonasi::with('organisasi')
+                ->whereHas('organisasi', function ($query) use ($search) {
+                    $query->where('nama_organisasi', 'like', '%' . $search . '%');
+                })
+                ->get();
+
+        $organisasiList = Organisasi::all();
+
+        return view('organisasi.request', [
+            'dataRequest' => $results,
+            'organisasiList' => $organisasiList,
+            'editMode' => false
+        ]);
+    }
+
+    public function editWeb($id)
+    {
+        $requestDonasi = RequestDonasi::findOrFail($id);
+        $dataRequest = RequestDonasi::with('organisasi')->get();
+        $organisasiList = Organisasi::all();
+
+        return view('organisasi.request', [
+            'requestDonasi' => $requestDonasi,
+            'dataRequest' => $dataRequest,
+            'organisasiList' => $organisasiList,
+            'editMode' => true
+        ]);
+    }
+
+    public function updateWeb(Request $request, $id)
     {
         $validatedData = $request->validate([
+            'id_organisasi' => 'required|exists:organisasi,id_organisasi',
             'deskripsi_request' => 'required|string',
-            'tgl_request' => 'required|date',
-            'status_request' => 'required|in:Diminta,Diterima,Ditolak,Selesai,Dikirim',
+            'status_request' => 'required|in:Diminta,Selesai,Diterima,Ditolak,Dikirim',
         ]);
 
-        $requestDonasi = RequestDonasi::find($id);
-        if (!$requestDonasi) {
-            return response()->json(['message' => 'Request Donasi tidak ditemukan'], 404);
-        }
-
+        $requestDonasi = RequestDonasi::findOrFail($id);
         $requestDonasi->update($validatedData);
-        return response()->json($requestDonasi);
+
+        return redirect()->route('organisasi.request.read')->with('success', 'Data Request berhasil diupdate!');
     }
 
-    public function destroy(string $id)
+    public function deleteWeb($id)
     {
-        $requestDonasi = RequestDonasi::find($id);
-        if (!$requestDonasi) {
-            return response()->json(['message' => 'Request Donasi tidak ditemukan'], 404);
-        }
-
+        $requestDonasi = RequestDonasi::findOrFail($id);
         $requestDonasi->delete();
-        return response()->json(['message' => 'Request Donasi berhasil dihapus']);
+
+        return redirect()->route('organisasi.request.read')->with('success', 'Request berhasil dihapus!');
     }
 
-    public function search($id)
-    {
-        $results = RequestDonasi::where('id_request_donasi', 'like', '%' . $id . '%')->get();
-
-        if ($results->isEmpty()) {
-            return response()->json(['message' => 'Request donasi tidak ditemukan'], 404);
-        }
-
-        return response()->json($results, 200);
-    }
 }
