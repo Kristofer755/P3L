@@ -26,5 +26,14 @@
         </div>
         <button type="submit">Login</button>
     </form>
+
+    <button onclick="window.location.href='{{ url('register/organisasi') }}'">
+        Register Organisasi
+    </button>
+
+    <button onclick="window.location.href='{{ url('register/organisasi') }}'">
+        Register Pembeli
+    </button>
+    
 </body>
 </html>

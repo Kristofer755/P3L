@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Alamat;
 use App\Models\Pembeli; 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 class AlamatController extends Controller
 {
@@ -42,9 +43,20 @@ class AlamatController extends Controller
 
     public function readWeb()
     {
-        $dataAlamat = Alamat::with('pembeli')->get(); 
-        $pembeliList = Pembeli::all();
+        $user = Session::get('user');
+    
+        $user = Session::get('user');
+        if (!$user || !isset($user['id_pembeli'])) {
+            return redirect('/login')->with('error', 'Harap login terlebih dahulu');
+        }
 
+    
+        $dataAlamat = Alamat::with('pembeli')
+                        ->where('id_pembeli', $user->id_pembeli)
+                        ->get();
+    
+        $pembeliList = Pembeli::where('id_pembeli', $user->id_pembeli)->get();
+    
         return view('pembeli.alamat', [
             'dataAlamat' => $dataAlamat,
             'pembeliList' => $pembeliList,
@@ -54,14 +66,23 @@ class AlamatController extends Controller
 
     public function searchWeb(Request $request)
     {
-        $search = $request->input('search');
+        $user = Session::get('user');
+    
+        $user = Session::get('user');
+        if (!$user || !isset($user['id_pembeli'])) {
+            return redirect('/login')->with('error', 'Harap login terlebih dahulu');
+        }
 
+    
+        $search = $request->input('search');
+    
         $results = Alamat::with('pembeli')
+                    ->where('id_pembeli', $user->id_pembeli)
                     ->where('nama_alamat', 'like', '%' . $search . '%')
                     ->get();
-
-        $pembeliList = Pembeli::all();
-
+    
+        $pembeliList = Pembeli::where('id_pembeli', $user->id_pembeli)->get();
+    
         return view('pembeli.alamat', [
             'dataAlamat' => $results,
             'pembeliList' => $pembeliList,
@@ -71,10 +92,22 @@ class AlamatController extends Controller
 
     public function editWeb($id)
     {
-        $alamat = Alamat::findOrFail($id);
-        $dataAlamat = Alamat::with('pembeli')->get();
-        $pembeliList = Pembeli::all();
-
+        $user = Session::get('user');
+    
+        if (!$user || !isset($user['id_pembeli'])) {
+            return redirect('/login')->with('error', 'Harap login terlebih dahulu');
+        }
+    
+        $alamat = Alamat::where('id_alamat', $id)
+                    ->where('id_pembeli', $user->id_pembeli)
+                    ->firstOrFail();
+    
+        $dataAlamat = Alamat::with('pembeli')
+                        ->where('id_pembeli', $user->id_pembeli)
+                        ->get();
+    
+        $pembeliList = Pembeli::where('id_pembeli', $user->id_pembeli)->get();
+    
         return view('pembeli.alamat', [
             'alamat' => $alamat,
             'dataAlamat' => $dataAlamat,
@@ -82,6 +115,7 @@ class AlamatController extends Controller
             'editMode' => true
         ]);
     }
+    
 
     public function updateWeb(Request $request, $id)
     {

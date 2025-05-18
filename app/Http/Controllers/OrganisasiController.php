@@ -52,6 +52,15 @@ class OrganisasiController extends Controller
         return view('admin.organisasi', ['organisasi' => $results]);
     }
 
+    // public function searchWeb(Request $request)
+    // {
+    //     $search = $request->input('search');
+
+    //     $results = Organisasi::where('no_telp_organisasi', 'like', '%' . $search . '%')->get();
+
+    //     return view('admin.organisasi', ['organisasi' => $results]);
+    // }
+
     public function editWeb($id)
     {
         $organisasi = Organisasi::findOrFail($id);

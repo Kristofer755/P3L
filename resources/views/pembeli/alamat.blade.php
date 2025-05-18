@@ -38,17 +38,11 @@
     @endif
 
         @csrf
+
         <div>
             <label>Pembeli:</label>
-            <select name="id_pembeli" required>
-                <option value="">-- Pilih Pembeli --</option>
-                @foreach ($pembeliList as $pembeli)
-                    <option value="{{ $pembeli->id_pembeli }}" 
-                        {{ old('id_pembeli', $alamat->id_pembeli ?? '') == $pembeli->id_pembeli ? 'selected' : '' }}>
-                        {{ $pembeli->nama_pembeli }}
-                    </option>
-                @endforeach
-            </select>
+            <input type="text" value="{{ $pembeliList->first()->nama_pembeli }}" readonly>
+            <input type="hidden" name="id_pembeli" value="{{ $pembeliList->first()->id_pembeli }}">
         </div>
 
         <div>
