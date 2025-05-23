@@ -3,10 +3,10 @@
 <head>
     <title>Edit Organisasi</title>
 </head>
+
 <body>
     <h1>Edit Data Organisasi</h1>
 
-    <!-- Tampilkan error validasi -->
     @if ($errors->any())
         <div style="color: red;">
             <ul>
@@ -48,4 +48,5 @@
     <br>
     <a href="{{ route('admin.organisasi.index') }}">Kembali ke Dashboard</a>
 </body>
+
 </html>

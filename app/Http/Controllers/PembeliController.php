@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Barang;
 use App\Models\Pembeli;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -86,14 +87,11 @@ class PembeliController extends Controller
 
         $pembeli = Pembeli::where('email', $request->email)->first();
 
-        // Generate random token
         $token = Str::random(60);
 
-        // Simpan token ke pembeli
         $pembeli->reset_token = $token;
         $pembeli->save();
 
-        // Kirim email
         $resetLink = url('/pembeli/reset-password-form?token=' . $token);
 
         Mail::raw("Klik link berikut untuk reset password: $resetLink", function ($message) use ($pembeli) {
@@ -124,16 +122,58 @@ class PembeliController extends Controller
             return back()->with('error', 'Token tidak valid.');
         }
     
-        // Reset password
-        $pembeli->password = $request->password; // Kalau di database disimpan plain
+        $pembeli->password = $request->password;
         $pembeli->reset_token = null;
         $pembeli->save();
     
-        // Reset juga user auth-nya
         User::where('email', $pembeli->email)->update([
             'password' => bcrypt($request->password),
         ]);
     
         return redirect('/login')->with('success', 'Password berhasil direset!');
     }
+
+    public function showProfile()
+    {
+        $pembeli = session('user'); 
+        return view('pembeli.profil', compact('pembeli'));
+    }
+
+    public function showBarang()
+    {
+        $barangs = Barang::all(); 
+        return view('dashboard.pembeli', compact('barangs'));
+    }
+
+    public function beli($id)
+    {
+        $barang = Barang::findOrFail($id);
+        return view('pembeli.checkout', compact('barang'));
+    }
+
+    public function keranjang(Request $request, $id)
+    {
+        // Validasi login
+        if (!session()->has('user')) {
+            return redirect()->route('login')->with('error', 'Harap login terlebih dahulu.');
+        }
+
+        $barang = Barang::findOrFail($id);
+
+        // Simpan ke session atau ke database
+        $keranjang = session()->get('keranjang', []);
+        $keranjang[$id] = [
+            'id_barang' => $barang->id_barang,
+            'nama_barang' => $barang->nama_barang,
+            'harga_barang' => $barang->harga_barang,
+            'gambar_barang' => $barang->gambar_barang,
+            'jumlah' => ($keranjang[$id]['jumlah'] ?? 0) + 1
+        ];
+
+        session()->put('keranjang', $keranjang);
+
+        return redirect()->back()->with('success', 'Barang ditambahkan ke keranjang.');
+    }
+
+
 }

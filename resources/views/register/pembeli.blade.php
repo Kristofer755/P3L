@@ -1,43 +1,58 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register Pembeli</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
-<body>
-    <h1>Form Registrasi Pembeli</h1>
+<body class="bg-light p-5">
 
-    @if (session('success'))
-        <p style="color: green;">{{ session('success') }}</p>
-    @endif
+    <div class="container">
+        <h1 class="mb-4 text-center">Form Registrasi Pembeli</h1>
 
-    <!-- Tampilkan error validasi jika ada -->
-    @if ($errors->any())
-        <div style="color: red;">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+        @if (session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
 
-    <!-- Form Register -->
-    <form method="POST" action="{{ route('register.pembeli.store') }}" >
-        @csrf
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-        <label>Nama Pembeli:</label><br>
-        <input type="text" name="nama_pembeli" value="{{ old('nama_pembeli') }}" required><br><br>
+        <form method="POST" action="{{ route('register.pembeli.store') }}">
+            @csrf
 
-        <label>No Telepon:</label><br>
-        <input type="text" name="no_telp" value="{{ old('no_telp') }}" required><br><br>
+            <div class="mb-3">
+                <label for="nama_pembeli" class="form-label">Nama Pembeli</label>
+                <input type="text" name="nama_pembeli" id="nama_pembeli" class="form-control" value="{{ old('nama_pembeli') }}" required>
+            </div>
 
-        <label>Email:</label><br>
-        <input type="email" name="email" value="{{ old('email') }}" required><br><br>
+            <div class="mb-3">
+                <label for="no_telp" class="form-label">No Telepon</label>
+                <input type="text" name="no_telp" id="no_telp" class="form-control" value="{{ old('no_telp') }}" required>
+            </div>
 
-        <label>Password:</label><br>
-        <input type="password" name="password" required><br><br>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" name="email" id="email" class="form-control" value="{{ old('email') }}" required>
+            </div>
 
-        <button type="submit">Daftar Pembeli</button>
-    </form>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" name="password" id="password" class="form-control" required>
+            </div>
+
+            <div class="mb-3 text-center">
+                <button type="submit" class="btn btn-primary">Daftar Pembeli</button>
+            </div>
+        </form>
+    </div>
+
 </body>
 </html>

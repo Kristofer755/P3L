@@ -22,25 +22,21 @@ class DiskusiProduk extends Model
         'tipe_sender',  
     ];
 
-    // Relasi ke pembeli
     public function pembeli()
     {
         return $this->belongsTo(Pembeli::class, 'id_pembeli');
     }
     
-    // Relasi ke pegawai
     public function pegawai()
     {
         return $this->belongsTo(Pegawai::class, 'id_pegawai');
     }
     
-    // Relasi ke barang
     public function barang()
     {
         return $this->belongsTo(Barang::class, 'id_barang');
     }
     
-    // Fungsi untuk mendapatkan nama pengirim pesan berdasarkan tipe_sender
     public function getNamaPengirimAttribute()
     {
         if ($this->tipe_sender == 'pembeli' && $this->pembeli) {

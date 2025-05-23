@@ -8,21 +8,43 @@ use App\Http\Controllers\PenitipController;
 use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\DiskusiProdukController;
 use App\Http\Controllers\RequestDonasiController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\BarangController;
+use App\Http\Controllers\Pembeli\TransaksiController;
 
 Route::get('/', function () {
-    return redirect('/login');
+    return view('home');
 });
 
+// Route::get('/', function () {
+//     return redirect('/login');
+// });
+
+// Login
 Route::get('/login', [LoginSessionController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginSessionController::class, 'login']);
-Route::post('/logout', [LoginSessionController::class, 'logout'])->middleware('auth');
+Route::post('/logout', [LoginSessionController::class, 'logout'])->name('logout');
 Route::get('/dashboard', [LoginSessionController::class, 'dashboard'])->middleware('auth');
 
+// Produk
+Route::get('/produk', [HomeController::class, 'welcome'])->name('produk');
+Route::get('/barang/{id}', [BarangController::class, 'show'])->name('barang.detail');
+Route::post('/diskusi/store', [DiskusiProdukController::class, 'store'])->name('diskusi.store');
+
+// Register
+Route::get('/register', function () {
+    return view('auth.register-options');
+})->name('register');
+Route::get('/register/pembeli', [PembeliController::class, 'showForm'])->name('register.pembeli');
+Route::post('/register/pembeli', [PembeliController::class, 'storeWeb'])->name('register.pembeli.store');
 Route::get('/register/organisasi', [OrganisasiController::class, 'showForm'])->name('organisasi.form');
 Route::post('/register/organisasi', [OrganisasiController::class, 'storeWeb'])->name('organisasi.store');
-Route::get('/register/pembeli', [PembeliController::class, 'showForm'])->name('register.pembeli.form');
-Route::post('/register/pembeli', [PembeliController::class, 'storeWeb'])->name('register.pembeli.store');
+Route::get('/register/alamat', [AlamatController::class, 'showForm']);
+Route::post('/register/alamat', [AlamatController::class, 'storeWeb']);
+Route::get('/register/penitip', [PenitipController::class, 'showForm']);
+Route::post('/register/penitip', [PenitipController::class, 'storeWeb']);
 
+// Admin
 Route::prefix('admin')->group(function () {
     Route::get('/organisasi', [OrganisasiController::class, 'readWeb'])->name('admin.organisasi.index');
     Route::get('/organisasi/search', [OrganisasiController::class, 'searchWeb'])->name('admin.organisasi.search');
@@ -31,7 +53,9 @@ Route::prefix('admin')->group(function () {
     Route::delete('/organisasi/delete/{id}', [OrganisasiController::class, 'deleteWeb'])->name('admin.organisasi.delete');
 });
 
+// Pembeli
 Route::prefix('pembeli')->group(function () {
+    Route::get('/pembeli/pembeli', function () {return view('pembeli.pembeli');})->name('pembeli.pembeli');
     Route::get('/alamat', [AlamatController::class, 'readWeb'])->name('pembeli.alamat');
     Route::get('/alamat/search', [AlamatController::class, 'searchWeb'])->name('pembeli.alamat.search');
     Route::post('/alamat/store', [AlamatController::class, 'storeWeb'])->name('pembeli.alamat.store');
@@ -40,6 +64,7 @@ Route::prefix('pembeli')->group(function () {
     Route::delete('/alamat/delete/{id}', [AlamatController::class, 'deleteWeb'])->name('pembeli.alamat.delete');
 });
 
+// CS
 Route::prefix('cs')->group(function () {
     Route::get('/penitip', [PenitipController::class, 'readWeb'])->name('cs.penitip.index');
     Route::get('/penitip/search', [PenitipController::class, 'searchWeb'])->name('cs.penitip.search');
@@ -49,6 +74,7 @@ Route::prefix('cs')->group(function () {
     Route::delete('/penitip/delete/{id}', [PenitipController::class, 'deleteWeb'])->name('cs.penitip.delete');
 });
 
+// Organisasi
 Route::prefix('organisasi')->group(function () {
     Route::get('/request', [RequestDonasiController::class, 'readWeb'])->name('organisasi.request.read');
     Route::get('/request/search', [RequestDonasiController::class, 'searchWeb'])->name('organisasi.request.search');
@@ -58,7 +84,8 @@ Route::prefix('organisasi')->group(function () {
     Route::delete('/request/{id}', [RequestDonasiController::class, 'deleteWeb'])->name('organisasi.request.delete');
 });
 
-Route::view('/dashboard/pembeli', 'dashboard.pembeli')->name('dashboard.pembeli');
+// Dashboard
+Route::get('/dashboard/pembeli', [PembeliController::class, 'showBarang'])->name('dashboard.pembeli');
 Route::view('/dashboard/penitip', 'dashboard.penitip')->name('dashboard.penitip');
 Route::view('/dashboard/admin', 'dashboard.admin')->name('dashboard.admin');
 Route::view('/dashboard/gudang', 'dashboard.gudang')->name('dashboard.gudang');
@@ -66,6 +93,11 @@ Route::view('/dashboard/owner', 'dashboard.owner')->name('dashboard.owner');
 Route::view('/dashboard/cs', 'dashboard.cs')->name('dashboard.cs');
 Route::view('/dashboard/organisasi', 'dashboard.organisasi')->name('dashboard.organisasi');
 
+// Profil
+Route::get('/penitip/profil', [PenitipController::class, 'showProfile'])->name('penitip.profil');
+Route::get('/pembeli/profil', [PembeliController::class, 'showProfile'])->name('pembeli.profil');
+
+// Pegawai
 Route::get('/pegawai/{id}/reset-password', [PegawaiController::class, 'resetPassword'])->name('pegawai.resetPassword');
 Route::get('/dashboard-admin', [PegawaiController::class, 'dashboardAdmin'])->name('dashboard.admin');
 Route::get('/dashboard/cs', [PegawaiController::class, 'dashboardCS'])->name('dashboard.cs');
@@ -86,6 +118,7 @@ Route::get('/dashboard/gudang', [PegawaiController::class, 'dashboardGudang'])->
 //     return view('pembeli.request-reset');
 // })->name('pembeli.requestReset');
 
+// Diskusi
 Route::prefix('diskusi')->group(function () {
     Route::get('/', [DiskusiProdukController::class, 'index'])->name('diskusi.index');
     Route::get('/{id}', [DiskusiProdukController::class, 'show'])->name('diskusi.show');
@@ -93,3 +126,14 @@ Route::prefix('diskusi')->group(function () {
     Route::post('/kirim', [DiskusiProdukController::class, 'kirimPesan'])->name('diskusi.kirim');
 });
 
+Route::prefix('pembeli/transaksi')->middleware('auth.pembeli')->group(function () {
+    Route::get('/', [TransaksiController::class, 'index'])->name('pembeli.transaksi.index');
+    Route::get('/{id}', [TransaksiController::class, 'detail'])->name('pembeli.transaksi.detail');
+});
+
+
+// Beli langsung (GET)
+Route::get('/pembeli/beli/{id}', [PembeliController::class, 'beli'])->name('pembeli.beli');
+
+// Masukkan ke keranjang (POST)
+Route::post('/keranjang/tambah/{id}', [KeranjangController::class, 'tambah'])->name('keranjang.tambah');

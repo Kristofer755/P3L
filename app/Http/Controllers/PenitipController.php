@@ -33,13 +33,11 @@ class PenitipController extends Controller
             'foto_ktp' => 'required|image|mimes:jpg,jpeg,png',
         ]);
 
-        // Generate ID Penitip otomatis (PEN1, PEN2, ...)
         $lastNumber = Penitip::selectRaw('MAX(CAST(SUBSTRING(id_penitip, 4) AS UNSIGNED)) as max_id')->value('max_id');
         $newNumber = $lastNumber ? $lastNumber + 1 : 1;
         $newId = 'PEN' . $newNumber;
         $validatedData['id_penitip'] = $newId;
 
-        // Simpan foto ktp
         $path = $request->file('foto_ktp')->store('ktp', 'public');
         $validatedData['foto_ktp'] = $path;
 
@@ -52,8 +50,8 @@ class PenitipController extends Controller
         $allPenitip = Penitip::all();
         return view('cs.penitip', ['penitip' => $allPenitip]);
         return view('cs.penitip', [
-            'penitipList' => $allPenitip,  // untuk tabel daftar
-            'penitip' => collect([])       // kosongkan default untuk form tambah
+            'penitipList' => $allPenitip,
+            'penitip' => collect([])      
         ]);
     }
 
@@ -110,4 +108,9 @@ class PenitipController extends Controller
         return redirect()->route('cs.penitip.index')->with('success', 'Penitip berhasil dihapus!');
     }
 
+    public function showProfile()
+    {
+        $penitip = session('user'); 
+        return view('penitip.detailProfil', compact('penitip'));
+    }
 }

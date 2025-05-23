@@ -21,4 +21,14 @@ class TransaksiPembelian extends Model
         'status_pembayaran',
         'bukti_pembayaran',
     ];
+
+    public function detailTransaksi()
+    {
+        return $this->hasMany(DetailTransaksiPembelian::class, 'id_detail_transaksi_pembelian', 'id_detail_transaksi_pembelian');
+    }
+
+    public function pembeli()
+    {
+        return $this->belongsTo(Pembeli::class, 'id_pembeli');
+    }
 }

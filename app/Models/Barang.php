@@ -21,11 +21,11 @@ class Barang extends Model
         'status_barang',
         'status_garansi',
         'kategori_barang',
+        'gambar_barang',
     ];
 
     public function diskusi()
     {
         return $this->hasMany(DiskusiProduk::class, 'id_barang', 'id_barang');
     }
-
 }

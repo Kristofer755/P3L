@@ -8,7 +8,6 @@
 
     <h2>Kelola Data Organisasi</h2>
 
-    <!-- Form Search -->
     <form method="GET" action="{{ route('admin.organisasi.search') }}">
 
     <form method="GET" action="{{ route('admin.organisasi.search') }}">
@@ -16,9 +15,7 @@
         <button type="submit">Cari</button>
     </form>
 
-    <!-- Show message if no data -->
     @if(isset($organisasi) && count($organisasi) > 0)
-        <!-- Tabel Read -->
         <table border="1" cellpadding="10" cellspacing="0">
             <thead>
                 <tr>
@@ -44,12 +41,10 @@
                     <td>{{ $org->status_organisasi }}</td>
                     <td>
                     
-                    <!-- Tombol Edit -->
                     <a href="{{ route('admin.organisasi.edit', $org->id_organisasi) }}">
                             <button type="button">Edit</button>
                         </a>
 
-                        <!-- Tombol Delete -->
                         <form action="{{ route('admin.organisasi.delete', $org->id_organisasi) }}" method="POST" style="display:inline;">
                             @csrf
                             @method('DELETE')

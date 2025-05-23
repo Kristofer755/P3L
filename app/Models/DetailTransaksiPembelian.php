@@ -19,4 +19,14 @@ class DetailTransaksiPembelian extends Model
         'harga_satuan_pembelian',
         'total_harga_pembelian',
     ];
+
+    public function transaksi()
+    {
+        return $this->belongsTo(TransaksiPembelian::class, 'id_detail_transaksi_pembelian', 'id_detail_transaksi_pembelian');
+    }
+
+    public function barang()
+    {
+        return $this->belongsTo(Barang::class, 'id_barang');
+    }
 }

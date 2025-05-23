@@ -35,4 +35,9 @@ class Pembeli extends Model
     {
         return $this->belongsTo(User::class, 'id_user', 'id');
     }
+    
+    public function profil()
+    {
+        return view('pembeli.profil');
+    }
 }

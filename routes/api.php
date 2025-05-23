@@ -11,10 +11,14 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LoginSessionController;
 use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\PenitipController;
+use App\Http\Controllers\MobileLoginController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+
+
+
 
     Route::get('/alamat', [AlamatController::class, 'index']);
     Route::post('/alamat/create', [AlamatController::class, 'store']);
@@ -63,3 +67,6 @@ Route::get('/user', function (Request $request) {
     Route::put('/penitip/update/{id}', [PenitipController::class, 'update']);
     Route::get('/penitip/search/{nama_penitip}', [PenitipController::class, 'search']);
     Route::delete('/penitip/delete/{id}', [PenitipController::class, 'destroy']);
+
+    Route::post('/login', [MobileLoginController::class, 'login']);
+    Route::get('/pegawai/kurir-hunter', [PegawaiController::class, 'kurirHunter']);

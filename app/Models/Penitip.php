@@ -21,5 +21,6 @@ class Penitip extends Model
         'no_telp',
         'saldo',
         'foto_ktp',
+        'poin',
     ];
 }

@@ -13,16 +13,13 @@ use Illuminate\Support\Facades\Auth;
 
 class LoginSessionController extends Controller
 {
-    // ✅ Tampilkan form login (Blade)
     public function showLoginForm()
     {
         return view('auth.login');
     }
 
-    // ✅ Proses login dengan session
     public function login(Request $request)
     {
-        // Validasi input
         $credentials = $request->validate([
             'email'    => 'required|email',
             'password' => 'required|string',
@@ -31,26 +28,22 @@ class LoginSessionController extends Controller
         $email = $request->email;
         $password = $request->password;
 
-        // Cek di tabel pembeli
         $pembeli = Pembeli::where('email', $email)->where('password', $password)->first();
         if ($pembeli) {
             Session::put('user', $pembeli);
             return redirect()->route('dashboard.pembeli');
         }
 
-        // Cek di tabel penitip
         $penitip = Penitip::where('email', $email)->where('password', $password)->first();
         if ($penitip) {
             Session::put('user', $penitip);
             return redirect()->route('dashboard.penitip');
         }
 
-        // Cek di tabel pegawai
         $pegawai = Pegawai::where('email', $email)->where('password', $password)->first();
         if ($pegawai) {
             Session::put('user', $pegawai);
 
-            // Cek role jabatan
             $jabatan = strtolower($pegawai->jabatan);
 
             if ($jabatan == 'admin') {
@@ -64,7 +57,6 @@ class LoginSessionController extends Controller
             }
         }
 
-        // Cek di tabel organisasi
         $organisasi = Organisasi::where('email', $email)->where('password', $password)->first();
         if ($organisasi) {
             Session::put('user', $organisasi);
@@ -74,7 +66,6 @@ class LoginSessionController extends Controller
         return back()->withErrors(['email' => 'Email atau password salah']);
     }
 
-    // ✅ Tampilkan halaman dashboard (hanya jika sudah login)
     public function dashboard()
     {
         return view('dashboard', [
@@ -82,12 +73,10 @@ class LoginSessionController extends Controller
         ]);
     }
 
-    // ✅ Logout
     public function logout(Request $request)
     {
         Auth::logout();
 
-        // Invalidate session + regenerate token CSRF
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
@@ -105,7 +94,7 @@ class LoginSessionController extends Controller
     
         $diskusi = DiskusiProduk::create([
             'id_barang' => $request->id_barang,
-            'id_pembeli' => $user->id_pembeli, // karena hanya pembeli yang bisa buat diskusi
+            'id_pembeli' => $user->id_pembeli,
             'judul_diskusi' => $request->judul_diskusi,
         ]);
     
@@ -122,7 +111,6 @@ class LoginSessionController extends Controller
     
         $user = Session::get('user');
     
-        // Cek apakah user adalah pembeli atau pegawai (CS)
         if (property_exists($user, 'id_pembeli')) {
             $senderType = 'pembeli';
             $senderId = $user->id_pembeli;
