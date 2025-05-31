@@ -10,15 +10,15 @@ use App\Http\Controllers\DiskusiProdukController;
 use App\Http\Controllers\RequestDonasiController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\BarangController;
-use App\Http\Controllers\Pembeli\TransaksiController;
+use App\Http\Controllers\KeranjangController;
+use App\Http\Controllers\PengirimanController;
+use App\Http\Controllers\TransaksiController;
+use App\Http\Controllers\TransaksiController as PembeliTransaksiController;
+use App\Http\Controllers\DetailTransaksiPembelianController; 
 
 Route::get('/', function () {
     return view('home');
 });
-
-// Route::get('/', function () {
-//     return redirect('/login');
-// });
 
 // Login
 Route::get('/login', [LoginSessionController::class, 'showLoginForm'])->name('login');
@@ -126,14 +126,30 @@ Route::prefix('diskusi')->group(function () {
     Route::post('/kirim', [DiskusiProdukController::class, 'kirimPesan'])->name('diskusi.kirim');
 });
 
-Route::prefix('pembeli/transaksi')->middleware('auth.pembeli')->group(function () {
-    Route::get('/', [TransaksiController::class, 'index'])->name('pembeli.transaksi.index');
-    Route::get('/{id}', [TransaksiController::class, 'detail'])->name('pembeli.transaksi.detail');
+Route::prefix('pembeli/transaksi') ->middleware('auth.pembeli') ->group(function () {
+    Route::get('/',    [PembeliTransaksiController::class, 'index'])->name('pembeli.transaksi.index');
+    Route::get('/{id}',[PembeliTransaksiController::class, 'detail'])->name('pembeli.transaksi.detail');
 });
 
+// — Beli Sekarang (single‐item checkout) —
+Route::get('/beli/{id_barang}', [TransaksiController::class, 'beliSekarang'])->name('pembeli.beli');
+Route::post('/transaksi/proses', [TransaksiController::class, 'prosesPembelian'])->name('transaksi.proses');
 
-// Beli langsung (GET)
-Route::get('/pembeli/beli/{id}', [PembeliController::class, 'beli'])->name('pembeli.beli');
+// — Keranjang —
+Route::get    ('/keranjang',           [KeranjangController::class, 'index'])->name('keranjang.index');
+Route::post   ('/keranjang/tambah/{id_barang}', [KeranjangController::class, 'tambah'])->name('keranjang.tambah');
+Route::delete ('/keranjang/hapus/{id_barang}', [KeranjangController::class, 'hapus'])->name('keranjang.hapus');
+Route::get    ('/keranjang/checkout', [TransaksiController::class, 'checkoutKeranjang'])->name('keranjang.checkout');
+Route::post   ('/transaksi/proses-keranjang', [TransaksiController::class, 'prosesKeranjang'])->name('transaksi.prosesKeranjang');
 
-// Masukkan ke keranjang (POST)
-Route::post('/keranjang/tambah/{id}', [KeranjangController::class, 'tambah'])->name('keranjang.tambah');
+// Tampilkan form upload bukti
+Route::get('/pembeli/transaksi/bukti/{id}', [TransaksiController::class, 'formBukti'])->name('transaksi.bukti');
+// Simpan bukti pembayaran
+Route::post('/pembeli/transaksi/bukti/{id}', [TransaksiController::class, 'uploadBukti'])->name('transaksi.uploadBukti');
+
+Route::get('/transaksi/batal/{id}', [TransaksiController::class, 'cancelBukti'])->name('transaksi.batal');
+
+
+Route::get('cs/validasi', [PegawaiController::class, 'CSIndex'])->name('cs.validasi.index');
+Route::post('cs/validasi/{id}/approve', [PegawaiController::class, 'approve'])->name('cs.validasi.approve');
+Route::post('cs/validasi/{id}/reject',  [PegawaiController::class, 'reject']) ->name('cs.validasi.reject');

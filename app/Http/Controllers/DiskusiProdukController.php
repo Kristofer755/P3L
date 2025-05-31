@@ -82,7 +82,9 @@ class DiskusiProdukController extends Controller
             'tipe_sender'  => $tipe_sender
         ]);
 
-        return redirect()->route('diskusi.index')->with('success', 'Pesan berhasil dikirim!');
+        // return redirect()->route('diskusi.index')->with('success', 'Pesan berhasil dikirim!');
+        return back()->with('success','Pesan berhasil dikirim!');
+
     }
 
     public function show($id)

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\pegawai;
+use App\Models\TransaksiPembelian;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -61,5 +62,43 @@ class PegawaiController extends Controller
         $pegawai = Pegawai::whereIn('jabatan', ['kurir', 'hunter'])->get();
         return response()->json($pegawai);  
     }
+
+    public function CSIndex()
+    {
+        $transaksis = TransaksiPembelian::with(['detailTransaksi.barang','pembeli','alamat'])
+                    ->whereNotNull('bukti_pembayaran')
+                    ->get();
+
+        return view('cs.validasi', compact('transaksis'));
+    }
+
+    public function approve($id)
+    {
+        $t = TransaksiPembelian::findOrFail($id);
+        $t->status_pembayaran = 'Disiapkan';
+        $t->save();
+        return back()->with('alert', 'Transaksi Disiapkan.');
+    }
+
+    public function reject($id)
+    {
+        $t = TransaksiPembelian::with('detailTransaksi')->findOrFail($id);
+        // rollback poin
+        $p = $t->pembeli;
+        $p->poin += $t->tukar_poin;
+        $p->save();
+        // rollback stok
+        foreach($t->detailTransaksi as $d) {
+        $b = $d->barang;
+        $b->status_barang = 'tersedia';
+        $b->save();
+        }
+        // ubah status
+        $t->status_pembayaran = 'Pembayaran Dibatalkan';
+        $t->save();
+
+        return back()->with('alert', 'Transaksi Dibatalkan.');
+    }
+
 
 }

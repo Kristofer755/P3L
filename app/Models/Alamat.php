@@ -17,6 +17,9 @@ class Alamat extends Model
         'id_pembeli',
         'nama_alamat',
         'detail_alamat',
+        'kota',
+        'provinsi',
+        'kode_pos',
         'status_default',
         'tipe_alamat',
     ];

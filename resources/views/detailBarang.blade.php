@@ -128,9 +128,47 @@
         text-align: center;
       }
     }
+
+    .btn-beli {
+      padding: 0.6rem 1.2rem;
+      background-color: #38a169;     
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .btn-beli:hover {
+      background-color: #2f855a;   
+    }
+
+    .btn-keranjang {
+      padding: 0.6rem 1.2rem;
+      background-color: #5a67d8;     
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .btn-keranjang:hover {
+      background-color: #434190;    
+    }
+
   </style>
 </head>
 <body>
+  <div style="position: absolute; top: 20px; right: 20px;">
+    <a href="{{ route('keranjang.index') }}" style="position: relative; text-decoration: none;">
+      🛒
+      @if(session('keranjang') && count(session('keranjang')) > 0)
+        <span style="position: absolute; top: -10px; right: -10px; background-color: red; color: white; font-size: 12px; padding: 2px 6px; border-radius: 50%;">
+          {{ count(session('keranjang')) }}
+        </span>
+      @endif
+    </a>
+  </div>
+
   <div class="container">
     <div class="produk-wrapper">
       <img class="produk-img" src="{{ asset('images/' . $barang->gambar_barang) }}" alt="{{ $barang->nama_barang }}">
@@ -139,53 +177,96 @@
         <p><strong>Harga:</strong> Rp {{ number_format($barang->harga_barang, 0, ',', '.') }}</p>
         <p><strong>Status Garansi:</strong> {{ $barang->status_garansi }}</p>
         <p><strong>Deskripsi:</strong><br>{{ $barang->deskripsi_barang }}</p>
-        <div style="margin-top: 1.5rem;">
-  <form action="{{ route('pembeli.beli', $barang->id_barang) }}" method="get" style="display:inline-block;">
-    <button type="submit" style="background-color: #10b981; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 6px; margin-right: 10px; cursor: pointer;">
-      Beli Sekarang
-    </button>
-  </form>
 
-  <form action="{{ route('keranjang.tambah', $barang->id_barang) }}" method="POST" style="display:inline-block;">
-    @csrf
-    <button type="submit" style="background-color: #6366f1; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 6px; cursor: pointer;">
-      Masukkan ke Keranjang
-    </button>
-  </form>
-</div>
+  @php
+    $user = session('user');
+  @endphp
 
-      </div>
+    <div style="margin-top: 1.5rem;">
+    @if($user && isset($user->id_pembeli))
+    <form action="{{ route('pembeli.beli', $barang->id_barang) }}" method="get" style="display:inline-block;">
+      <button type="submit" class="btn-beli">Beli Sekarang</button>
+    </form>
+
+    <form action="{{ route('keranjang.tambah', $barang->id_barang) }}" method="POST" style="display:inline-block;">
+      @csrf
+      <button type="submit" class="btn-keranjang">Masukkan ke Keranjang</button>
+    </form>
+    @else
+    <button
+      type="button"
+      onclick="alert('Silakan login terlebih dahulu untuk melakukan pembelian.');
+        window.location.href='{{ route('login') }}';"
+      class="btn-beli">Beli Sekarang
+    </button>
+
+    <button type="button"
+      onclick="alert('Silakan login terlebih dahulu untuk menambah ke keranjang.')
+        window.location.href='{{ route('login') }}';"
+      class="btn-keranjang">Masukkan ke Keranjang
+    </button>
+    @endif
     </div>
+  </div>
 
+    
     <div class="diskusi">
       <h2>Diskusi Produk</h2>
 
+      {{-- Notifikasi sukses / error --}}
+      @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+      @endif
+      @if(session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+      @endif
+
+      {{-- Daftar Diskusi --}}
       @foreach ($diskusi as $item)
-        <div class="diskusi-item">
-          <strong>{{ $item->user->name ?? 'Pengguna' }}</strong>
+        <div class="diskusi-item {{ $item->tipe_sender == 'pembeli' ? 'diskusi-pembeli' : 'diskusi-admin' }}">
+          <div class="d-flex justify-content-between">
+            <strong>{{ $item->user->name ?? $item->nama_pengirim ?? 'Pengguna' }}</strong>
+            <small>
+              {{ \Carbon\Carbon::parse($item->tanggal_diskusi ?? $item->tgl_diskusi)
+                    ->translatedFormat('d F Y, H:i') }}
+            </small>
+          </div>
           <p>{{ $item->pesan }}</p>
-          <small>{{ \Carbon\Carbon::parse($item->tanggal_diskusi)->translatedFormat('d F Y, H:i') }}</small>
         </div>
       @endforeach
 
+      {{-- Pagination --}}
       <div class="pagination">
         {{ $diskusi->links() }}
       </div>
 
-      @auth
-        <div class="form-diskusi">
-          <form method="POST" action="{{ route('diskusi.store', $barang->id_barang) }}">
-            @csrf
-            <label for="pesan">Tulis Komentar:</label>
-            <textarea name="pesan" id="pesan" rows="3" required></textarea>
-            <br>
-            <button type="submit">Kirim</button>
-          </form>
-        </div>
-      @else
-        <p class="login-reminder">Silakan login untuk ikut berdiskusi.</p>
-      @endauth
+      {{-- Form Tulis / Balas Diskusi --}}
+      <div class="form-diskusi mt-4">
+        <form method="POST" action="{{ route('diskusi.store', $barang->id_barang) }}">
+          @csrf
+          <input type="hidden" name="id_barang" value="{{ $barang->id_barang }}">
+          <label for="pesan">Tulis Komentar:</label>
+          <textarea
+            name="pesan"
+            id="pesan"
+            rows="3"
+            class="form-control mb-2"
+            required
+          ></textarea>
+
+          @if(!$user || !isset($user->id_pembeli))
+            <button
+              type="button" class="btn btn-secondary"
+              onclick="alert('Silakan login terlebih dahulu untuk mengirim komentar.');
+                      window.location.href='{{ route('login') }}';"
+            >Kirim
+            </button>
+          @else
+            <button type="submit" class="btn btn-primary">Kirim</button>
+          @endif
+        </form>
     </div>
+</div>
   </div>
 </body>
 </html>

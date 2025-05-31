@@ -18,5 +18,12 @@
         <button type="submit">Diskusi Produk</button>
     </form>
 
+    <!-- Tombol Baru: Validasi Pembayaran -->
+    <form action="{{ route('cs.validasi.index') }}" method="get" class="mt-4">
+        <button type="submit" class="btn btn-primary">
+            Validasi Pembayaran
+        </button>
+    </form>
+
 </body>
 </html>

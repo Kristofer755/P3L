@@ -27,6 +27,9 @@ class AlamatController extends Controller
             'id_pembeli' => 'required|exists:pembeli,id_pembeli',
             'nama_alamat' => 'required|string',
             'detail_alamat' => 'required|string',
+            'kota' => 'required|string',
+            'provinsi' => 'required|string',
+            'kode_pos' => 'required|int',
             'tipe_alamat' => 'required|string',
             'status_default' => 'required|in:aktif,nonaktif,Aktif,Nonaktif',
         ]);
@@ -123,6 +126,9 @@ class AlamatController extends Controller
             'id_pembeli' => 'required|exists:pembeli,id_pembeli',
             'nama_alamat' => 'required|string',
             'detail_alamat' => 'required|string',
+            'kota' => 'required|string',
+            'provinsi' => 'required|string',
+            'kode_pos' => 'required|int',
             'tipe_alamat' => 'required|string',
             'status_default' => 'required|in:aktif,nonaktif,Aktif,Nonaktif',
         ]);
