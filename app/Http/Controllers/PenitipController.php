@@ -99,7 +99,6 @@ class PenitipController extends Controller
         return redirect()->route('cs.penitip.index')->with('success', 'Data Penitip berhasil diupdate!');
     }
 
-
     public function deleteWeb($id)
     {
         $penitip = Penitip::findOrFail($id);
@@ -113,4 +112,19 @@ class PenitipController extends Controller
         $penitip = session('user'); 
         return view('penitip.detailProfil', compact('penitip'));
     }
+
+    public function updateFcmToken(Request $request)
+    {
+        $request->validate([
+            'id_penitip' => 'required|exists:penitip,id_penitip',
+            'fcm_token'  => 'required|string',
+        ]);
+
+        $penitip = Penitip::find($request->id_penitip);
+        $penitip->fcm_token = $request->fcm_token;
+        $penitip->save();
+
+        return response()->json(['success' => true]);
+    }
+
 }

@@ -28,4 +28,10 @@ class Barang extends Model
     {
         return $this->hasMany(DiskusiProduk::class, 'id_barang', 'id_barang');
     }
+
+    public function detailTransaksiPenitipan()
+    {
+        return $this->hasOne(DetailTransaksiPenitipan::class, 'id_barang', 'id_barang');
+    }
+
 }

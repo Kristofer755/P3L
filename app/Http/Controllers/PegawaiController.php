@@ -6,6 +6,7 @@ use App\Models\pegawai;
 use App\Models\TransaksiPembelian;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Models\NotifikasiPenitip;
 
 class PegawaiController extends Controller
 {
@@ -74,11 +75,31 @@ class PegawaiController extends Controller
 
     public function approve($id)
     {
-        $t = TransaksiPembelian::findOrFail($id);
+        $t = TransaksiPembelian::with('detailTransaksi.barang')->findOrFail($id);
         $t->status_pembayaran = 'Disiapkan';
         $t->save();
-        return back()->with('alert', 'Transaksi Disiapkan.');
+
+        // Loop semua barang di transaksi ini
+        foreach ($t->detailTransaksi as $detail) {
+            $barang = $detail->barang;
+            
+            // Pastikan relasi barang ke detail transaksi penitipan ada penitip
+            if ($barang && $barang->detailTransaksiPenitipan) {
+                $penitip = $barang->detailTransaksiPenitipan->penitip;
+
+                if ($penitip) {
+                    NotifikasiPenitip::create([
+                        'id_penitip' => $penitip->id_penitip,
+                        'judul' => 'Barang laku terjual',
+                        'pesan' => 'Selamat, barang Anda sudah laku terjual. Silakan cek statusnya.',
+                    ]);
+                }
+            }
+        }
+
+        return back()->with('alert', 'Transaksi Disiapkan dan Notifikasi dikirim.');
     }
+
 
     public function reject($id)
     {

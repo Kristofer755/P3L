@@ -153,3 +153,6 @@ Route::get('/transaksi/batal/{id}', [TransaksiController::class, 'cancelBukti'])
 Route::get('cs/validasi', [PegawaiController::class, 'CSIndex'])->name('cs.validasi.index');
 Route::post('cs/validasi/{id}/approve', [PegawaiController::class, 'approve'])->name('cs.validasi.approve');
 Route::post('cs/validasi/{id}/reject',  [PegawaiController::class, 'reject']) ->name('cs.validasi.reject');
+
+Route::post('/update-fcm-token', [PenitipController::class, 'updateFcmToken']);
+
