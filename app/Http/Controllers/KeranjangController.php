@@ -13,10 +13,27 @@ use Illuminate\Support\Carbon;
 
 class KeranjangController extends Controller
 {
+    // public function index()
+    // {
+    //     return view('pembeli.transaksi.keranjang');
+    // }
     public function index()
-    {
-        return view('pembeli.transaksi.keranjang');
+{
+    $keranjang = session()->get('keranjang', []);
+    $detailBarang = [];
+
+    foreach ($keranjang as $id_barang => $item) {
+        $barang = Barang::find($id_barang);
+        $detailBarang[$id_barang] = [
+            'data' => $item,
+            'status' => ($barang && $barang->status_barang  == 'tersedia'), // status atau apapun indikator stok/terjual di table barang
+            'alasan' => ($barang && $barang->status_barang  != 'tersedia') ? 'Barang sudah dibeli orang lain' : '',
+        ];
     }
+
+    return view('pembeli.transaksi.keranjang', compact('detailBarang'));
+}
+
 
     public function tambah(Request $request, $id_barang)
     {

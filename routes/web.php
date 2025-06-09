@@ -14,7 +14,9 @@ use App\Http\Controllers\KeranjangController;
 use App\Http\Controllers\PengirimanController;
 use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\TransaksiController as PembeliTransaksiController;
-use App\Http\Controllers\DetailTransaksiPembelianController; 
+use App\Http\Controllers\DetailTransaksiPembelianController;
+use App\Http\Controllers\TransaksiPengirimanController;
+use App\Http\Controllers\LaporanController;
 
 Route::get('/', function () {
     return view('home');
@@ -89,7 +91,7 @@ Route::get('/dashboard/pembeli', [PembeliController::class, 'showBarang'])->name
 Route::view('/dashboard/penitip', 'dashboard.penitip')->name('dashboard.penitip');
 Route::view('/dashboard/admin', 'dashboard.admin')->name('dashboard.admin');
 Route::view('/dashboard/gudang', 'dashboard.gudang')->name('dashboard.gudang');
-Route::view('/dashboard/owner', 'dashboard.owner')->name('dashboard.owner');
+// Route::view('/dashboard/owner', 'dashboard.owner')->name('dashboard.owner');
 Route::view('/dashboard/cs', 'dashboard.cs')->name('dashboard.cs');
 Route::view('/dashboard/organisasi', 'dashboard.organisasi')->name('dashboard.organisasi');
 
@@ -156,3 +158,38 @@ Route::post('cs/validasi/{id}/reject',  [PegawaiController::class, 'reject']) ->
 
 Route::post('/update-fcm-token', [PenitipController::class, 'updateFcmToken']);
 
+Route::prefix('gudang/pengiriman')->group(function () {
+    Route::get('/', [TransaksiPengirimanController::class, 'index'])->name('gudang.pengiriman.index');
+    Route::get('/{id}', [TransaksiPengirimanController::class, 'show'])->name('gudang.pengiriman.show');
+    Route::post('/{id}/jadwal', [TransaksiPengirimanController::class, 'jadwalkan'])->name('gudang.pengiriman.jadwal');
+    Route::post('/{id}/selesai', [TransaksiPengirimanController::class, 'konfirmasiSelesai'])->name('gudang.pengiriman.selesai');
+    Route::get('/{id}/nota', [TransaksiPengirimanController::class, 'cetakNota'])->name('gudang.pengiriman.nota');
+});
+
+Route::get('/gudang/pengiriman/{id}/nota', [NotaPengirimanController::class, 'cetakNota']);
+
+// Detail
+Route::get('/gudang/pengiriman/{id}', [TransaksiPengirimanController::class, 'show']);
+
+// Simpan Jadwal
+Route::post('/gudang/pengiriman/{id}/jadwalkan', [TransaksiPengirimanController::class, 'jadwalkan']);
+
+// Cetak Nota
+Route::get('/gudang/pengiriman/{id}/nota', [TransaksiPengirimanController::class, 'cetakNota']);
+
+Route::post('/gudang/pengiriman/assign/{id}', [TransaksiPengirimanController::class, 'assignKurir'])->name('gudang.pengiriman.assign');
+
+Route::get('/gudang/pengiriman', [TransaksiPengirimanController::class, 'index'])->name('gudang.pengiriman.index');
+
+Route::get('/gudang/pengiriman/{id}', [TransaksiPengirimanController::class, 'show'])->name('gudang.pengiriman.show');
+
+Route::get('/gudang/pengiriman/{id}/nota', [TransaksiPengirimanController::class, 'cetakNota'])->name('gudang.pengiriman.nota');
+
+// Laporan
+Route::get('/laporan/request_donasi', [LaporanController::class, 'requestDonasiPdf'])->name('laporan.request_donasi');
+
+Route::get('/laporan/donasi', [LaporanController::class, 'laporanDonasiPdf'])->name('laporan.donasi');
+
+Route::get('/laporan/penitip/pdf', [LaporanController::class, 'cetakPdfLaporanPenitip'])->name('laporan.penitip.pdf');
+
+Route::post('/laporan/penitip', [LaporanController::class, 'laporanPenitipPdf'])->name('laporan.penitip');

@@ -29,4 +29,15 @@ class DetailTransaksiPenitipan extends Model
         return $this->hasOne(TransaksiPenitipan::class, 'id_detail_transaksi_penitipan', 'id_detail_transaksi_penitipan');
     }
 
+    public function penitip()
+    {
+        return $this->hasOneThrough(
+            Penitip::class,                // model tujuan
+            TransaksiPenitipan::class,     // model perantara
+            'id_detail_transaksi_penitipan', // FK di transaksi_penitipan
+            'id_penitip',                  // FK di penitip
+            'id_detail_transaksi_penitipan', // localKey di detail_transaksi_penitipan
+            'id_penitip'                   // localKey di transaksi_penitipan
+        );
+    }
 }

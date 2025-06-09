@@ -212,7 +212,7 @@ class TransaksiController extends Controller
 
         // --- rollback poin ---
         $pembeli = $transaksi->pembeli;
-        $poinDipakai = $transaksi->tukar_poin ?? 0;      // pastikan kolom tukar_poin ada
+        $poinDipakai = $transaksi->tukar_poin ?? 0;      
         $pembeli->poin += $poinDipakai;
         $pembeli->save();
         Session::put('user', $pembeli);
@@ -289,150 +289,309 @@ class TransaksiController extends Controller
         ));
     }
 
+    // public function prosesKeranjang(Request $request)
+    // {
+    //     $user      = Session::get('user');
+    //     $pembeli   = Pembeli::findOrFail($user->id_pembeli);
+    //     $keranjang = Session::get('keranjang', []);
+
+    //     if (empty($keranjang)) {
+    //         return redirect()->route('keranjang.index')
+    //                         ->with('error', 'Keranjang kosong.');
+    //     }
+
+    //     // Validasi input (metode pengiriman & alamat, dan tukar poin)
+    //     $request->validate([
+    //         'metode_pengiriman' => 'required|in:kurir,ambil',
+    //         'alamat_pengiriman' => [
+    //             'required_if:metode_pengiriman,kurir',
+    //             Rule::exists('alamat','id_alamat')
+    //                 ->where('id_pembeli', $user->id_pembeli)
+    //                 ->where('kota','Yogyakarta'),
+    //         ],
+    //         'tukar_poin' => [
+    //             'nullable',
+    //             'integer',
+    //             'min:0',
+    //             function ($attribute, $value, $fail) use ($pembeli) {
+    //                 if ($value > $pembeli->poin) {
+    //                     $fail('Poin yang ditukar melebihi saldo poin Anda.');
+    //                 }
+    //                 if ($value % 100 !== 0) {
+    //                     $fail('Penukaran poin harus kelipatan 100.');
+    //                 }
+    //             }
+    //         ]
+    //     ]);
+
+    //     $idAlamat = $request->metode_pengiriman === 'kurir'
+    //             ? $request->alamat_pengiriman
+    //             : null;
+    //     $tukarPoin = $request->tukar_poin ?? 0;
+    //     $diskon = intval($tukarPoin / 100) * 10000;
+
+    //     // 1. Hitung subtotal semua barang
+    //     $subtotal = 0;
+    //     foreach ($keranjang as $barangId => $item) {
+    //         $subtotal += $item['harga'] * $item['jumlah'];
+    //     }
+
+    //     // 2. Hitung ongkir (berlaku untuk subtotal semua barang)
+    //     $ongkir = ($request->metode_pengiriman === 'kurir' && $subtotal < 1500000) ? 100000 : 0;
+
+    //     // 3. Hitung total bayar setelah diskon
+    //     $totalBayar = max(0, $subtotal + $ongkir - $diskon);
+
+    //     // 4. Generate ID transaksi
+    //     $lastNumber  = TransaksiPembelian::selectRaw(
+    //         'MAX(CAST(SUBSTRING(id_transaksi_pembelian,5) AS UNSIGNED)) as max_id'
+    //     )->value('max_id');
+    //     $newNumber   = $lastNumber ? $lastNumber + 1 : 1;
+    //     $idTransaksi = 'TPEM'.$newNumber;
+
+    //     // 5. Simpan transaksi (header)
+    //     $transaksi = TransaksiPembelian::create([
+    //         'id_transaksi_pembelian' => $idTransaksi,
+    //         'id_pembeli'             => $user->id_pembeli,
+    //         'id_alamat'              => $idAlamat,
+    //         'tgl_transaksi'          => now(),
+    //         'total_pembayaran'       => $totalBayar,
+    //         'status_pembayaran'      => 'belum dibayar',
+    //         'tukar_poin'             => $tukarPoin,
+    //         // 'no_transaksi' akan diisi setelah dapat id
+    //     ]);
+
+    //     // 6. Generate no_transaksi
+    //     $tahun = date('y', strtotime($transaksi->tgl_transaksi)); // dua digit tahun
+    //     $bulan = date('m', strtotime($transaksi->tgl_transaksi)); // dua digit bulan
+    //     preg_match('/(\d+)$/', $transaksi->id_transaksi_pembelian, $match);
+    //     $angkaUrut = $match[1] ?? '0';
+    //     $transaksi->no_transaksi = "$tahun.$bulan.$angkaUrut";
+    //     $transaksi->save();
+
+    //     // 7. Simpan detail transaksi untuk tiap item di keranjang
+    //     $lastDetail = DB::table('detail_transaksi_pembelian')
+    //         ->selectRaw("MAX(CAST(SUBSTRING(id_detail_transaksi_pembelian,5) AS UNSIGNED)) as max_id")
+    //         ->value('max_id');
+    //     $counter = $lastDetail ?: 0;
+
+    //     foreach ($keranjang as $barangId => $item) {
+    //         $counter++;
+    //         $idDetail = 'DPEM' . $counter;
+
+    //         DetailTransaksiPembelian::create([
+    //             'id_detail_transaksi_pembelian' => $idDetail,
+    //             'id_transaksi_pembelian'        => $idTransaksi,
+    //             'id_barang'                     => $barangId,
+    //             'jml_barang_pembelian'          => $item['jumlah'],
+    //             'harga_satuan_pembelian'        => $item['harga'],
+    //             'total_harga_pembelian'         => $item['jumlah'] * $item['harga'],
+    //         ]);
+
+    //         // Update status barang
+    //         $barang = Barang::find($barangId);
+    //         if ($barang) {
+    //             $barang->status_barang = 'sold out';
+    //             $barang->save();
+    //         }
+    //     }
+
+    //     // 8. Generate ID Pengiriman
+    //     $lastShip = Pengiriman::selectRaw(
+    //         'MAX(CAST(SUBSTRING(id_pengiriman,4) AS UNSIGNED)) as max_id'
+    //     )->value('max_id');
+    //     $nextShip    = $lastShip ? $lastShip + 1 : 1;
+    //     $idPengiriman = 'PGR' . $nextShip;
+
+    //     $kurirIds  = ['PEG15','PEG2','PEG5'];
+    //     $gudangIds = ['PEG12','PEG16','PEG20','PEG3'];
+
+    //     $pool       = $request->metode_pengiriman === 'kurir'
+    //                 ? $kurirIds
+    //                 : $gudangIds;
+    //     $idPegawai  = $pool[array_rand($pool)];
+
+    //     Pengiriman::create([
+    //         'id_pengiriman'          => $idPengiriman,
+    //         'id_transaksi_pembelian' => $idTransaksi,
+    //         'id_pegawai'             => $idPegawai,
+    //         'tgl_pengiriman'         => now(),
+    //         'status_pengiriman'      => 'diproses',
+    //         'tipe_pengiriman'        => $request->metode_pengiriman,
+    //     ]);
+
+    //     // 9. Kurangi poin pembeli jika ada penukaran poin
+    //     $pembeli->poin -= $tukarPoin;
+    //     $pembeli->save();
+    //     Session::put('user', $pembeli);
+
+    //     // 10. Bersihkan keranjang
+    //     Session::forget('keranjang');
+
+    //     // 11. Redirect ke form upload bukti pembayaran
+    //     return redirect()
+    //         ->route('transaksi.bukti', ['id' => $idTransaksi])
+    //         ->with('alert', 'Silakan upload bukti pembayaran!');
+    // }
+
     public function prosesKeranjang(Request $request)
-    {
-        $user      = Session::get('user');
-        $pembeli   = Pembeli::findOrFail($user->id_pembeli);
-        $keranjang = Session::get('keranjang', []);
+{
+    $user      = Session::get('user');
+    $pembeli   = Pembeli::findOrFail($user->id_pembeli);
+    $keranjang = Session::get('keranjang', []);
 
-        if (empty($keranjang)) {
-            return redirect()->route('keranjang.index')
-                            ->with('error', 'Keranjang kosong.');
-        }
-
-        // Validasi input (metode pengiriman & alamat, dan tukar poin)
-        $request->validate([
-            'metode_pengiriman' => 'required|in:kurir,ambil',
-            'alamat_pengiriman' => [
-                'required_if:metode_pengiriman,kurir',
-                Rule::exists('alamat','id_alamat')
-                    ->where('id_pembeli', $user->id_pembeli)
-                    ->where('kota','Yogyakarta'),
-            ],
-            'tukar_poin' => [
-                'nullable',
-                'integer',
-                'min:0',
-                function ($attribute, $value, $fail) use ($pembeli) {
-                    if ($value > $pembeli->poin) {
-                        $fail('Poin yang ditukar melebihi saldo poin Anda.');
-                    }
-                    if ($value % 100 !== 0) {
-                        $fail('Penukaran poin harus kelipatan 100.');
-                    }
-                }
-            ]
-        ]);
-
-        $idAlamat = $request->metode_pengiriman === 'kurir'
-                ? $request->alamat_pengiriman
-                : null;
-        $tukarPoin = $request->tukar_poin ?? 0;
-        $diskon = intval($tukarPoin / 100) * 10000;
-
-        // 1. Hitung subtotal semua barang
-        $subtotal = 0;
-        foreach ($keranjang as $barangId => $item) {
-            $subtotal += $item['harga'] * $item['jumlah'];
-        }
-
-        // 2. Hitung ongkir (berlaku untuk subtotal semua barang)
-        $ongkir = ($request->metode_pengiriman === 'kurir' && $subtotal < 1500000) ? 100000 : 0;
-
-        // 3. Hitung total bayar setelah diskon
-        $totalBayar = max(0, $subtotal + $ongkir - $diskon);
-
-        // 4. Generate ID transaksi
-        $lastNumber  = TransaksiPembelian::selectRaw(
-            'MAX(CAST(SUBSTRING(id_transaksi_pembelian,5) AS UNSIGNED)) as max_id'
-        )->value('max_id');
-        $newNumber   = $lastNumber ? $lastNumber + 1 : 1;
-        $idTransaksi = 'TPEM'.$newNumber;
-
-        // 5. Simpan transaksi (header)
-        $transaksi = TransaksiPembelian::create([
-            'id_transaksi_pembelian' => $idTransaksi,
-            'id_pembeli'             => $user->id_pembeli,
-            'id_alamat'              => $idAlamat,
-            'tgl_transaksi'          => now(),
-            'total_pembayaran'       => $totalBayar,
-            'status_pembayaran'      => 'belum dibayar',
-            'tukar_poin'             => $tukarPoin,
-            // 'no_transaksi' akan diisi setelah dapat id
-        ]);
-
-        // 6. Generate no_transaksi
-        $tahun = date('y', strtotime($transaksi->tgl_transaksi)); // dua digit tahun
-        $bulan = date('m', strtotime($transaksi->tgl_transaksi)); // dua digit bulan
-        preg_match('/(\d+)$/', $transaksi->id_transaksi_pembelian, $match);
-        $angkaUrut = $match[1] ?? '0';
-        $transaksi->no_transaksi = "$tahun.$bulan.$angkaUrut";
-        $transaksi->save();
-
-        // 7. Simpan detail transaksi untuk tiap item di keranjang
-        $lastDetail = DB::table('detail_transaksi_pembelian')
-            ->selectRaw("MAX(CAST(SUBSTRING(id_detail_transaksi_pembelian,5) AS UNSIGNED)) as max_id")
-            ->value('max_id');
-        $counter = $lastDetail ?: 0;
-
-        foreach ($keranjang as $barangId => $item) {
-            $counter++;
-            $idDetail = 'DPEM' . $counter;
-
-            DetailTransaksiPembelian::create([
-                'id_detail_transaksi_pembelian' => $idDetail,
-                'id_transaksi_pembelian'        => $idTransaksi,
-                'id_barang'                     => $barangId,
-                'jml_barang_pembelian'          => $item['jumlah'],
-                'harga_satuan_pembelian'        => $item['harga'],
-                'total_harga_pembelian'         => $item['jumlah'] * $item['harga'],
-            ]);
-
-            // Update status barang
-            $barang = Barang::find($barangId);
-            if ($barang) {
-                $barang->status_barang = 'sold out';
-                $barang->save();
-            }
-        }
-
-        // 8. Generate ID Pengiriman
-        $lastShip = Pengiriman::selectRaw(
-            'MAX(CAST(SUBSTRING(id_pengiriman,4) AS UNSIGNED)) as max_id'
-        )->value('max_id');
-        $nextShip    = $lastShip ? $lastShip + 1 : 1;
-        $idPengiriman = 'PGR' . $nextShip;
-
-        $kurirIds  = ['PEG15','PEG2','PEG5'];
-        $gudangIds = ['PEG12','PEG16','PEG20','PEG3'];
-
-        $pool       = $request->metode_pengiriman === 'kurir'
-                    ? $kurirIds
-                    : $gudangIds;
-        $idPegawai  = $pool[array_rand($pool)];
-
-        Pengiriman::create([
-            'id_pengiriman'          => $idPengiriman,
-            'id_transaksi_pembelian' => $idTransaksi,
-            'id_pegawai'             => $idPegawai,
-            'tgl_pengiriman'         => now(),
-            'status_pengiriman'      => 'diproses',
-            'tipe_pengiriman'        => $request->metode_pengiriman,
-        ]);
-
-        // 9. Kurangi poin pembeli jika ada penukaran poin
-        $pembeli->poin -= $tukarPoin;
-        $pembeli->save();
-        Session::put('user', $pembeli);
-
-        // 10. Bersihkan keranjang
-        Session::forget('keranjang');
-
-        // 11. Redirect ke form upload bukti pembayaran
-        return redirect()
-            ->route('transaksi.bukti', ['id' => $idTransaksi])
-            ->with('alert', 'Silakan upload bukti pembayaran!');
+    if (empty($keranjang)) {
+        return redirect()->route('keranjang.index')
+                        ->with('error', 'Keranjang kosong.');
     }
+
+    // Cek status semua barang di keranjang
+    $barangList = Barang::whereIn('id_barang', array_keys($keranjang))->get()->keyBy('id_barang');
+    $barangSoldOut = [];
+    foreach ($keranjang as $barangId => $item) {
+        if (!isset($barangList[$barangId]) || $barangList[$barangId]->status_barang !== 'tersedia') {
+            $barangSoldOut[] = $item['nama']; // ambil nama barang untuk pesan error
+        }
+    }
+    if (count($barangSoldOut) > 0) {
+        return redirect()->route('keranjang.index')
+            ->with('error', 'Barang berikut sudah tidak tersedia: ' . implode(', ', $barangSoldOut) . '. Silakan hapus dari keranjang.');
+    }
+
+    // Validasi input (metode pengiriman & alamat, dan tukar poin)
+    $request->validate([
+        'metode_pengiriman' => 'required|in:kurir,ambil',
+        'alamat_pengiriman' => [
+            'required_if:metode_pengiriman,kurir',
+            Rule::exists('alamat','id_alamat')
+                ->where('id_pembeli', $user->id_pembeli)
+                ->where('kota','Yogyakarta'),
+        ],
+        'tukar_poin' => [
+            'nullable',
+            'integer',
+            'min:0',
+            function ($attribute, $value, $fail) use ($pembeli) {
+                if ($value > $pembeli->poin) {
+                    $fail('Poin yang ditukar melebihi saldo poin Anda.');
+                }
+                if ($value % 100 !== 0) {
+                    $fail('Penukaran poin harus kelipatan 100.');
+                }
+            }
+        ]
+    ]);
+
+    $idAlamat = $request->metode_pengiriman === 'kurir'
+            ? $request->alamat_pengiriman
+            : null;
+    $tukarPoin = $request->tukar_poin ?? 0;
+    $diskon = intval($tukarPoin / 100) * 10000;
+
+    // 1. Hitung subtotal semua barang
+    $subtotal = 0;
+    foreach ($keranjang as $barangId => $item) {
+        $subtotal += $item['harga'] * $item['jumlah'];
+    }
+
+    // 2. Hitung ongkir (berlaku untuk subtotal semua barang)
+    $ongkir = ($request->metode_pengiriman === 'kurir' && $subtotal < 1500000) ? 100000 : 0;
+
+    // 3. Hitung total bayar setelah diskon
+    $totalBayar = max(0, $subtotal + $ongkir - $diskon);
+
+    // 4. Generate ID transaksi
+    $lastNumber  = TransaksiPembelian::selectRaw(
+        'MAX(CAST(SUBSTRING(id_transaksi_pembelian,5) AS UNSIGNED)) as max_id'
+    )->value('max_id');
+    $newNumber   = $lastNumber ? $lastNumber + 1 : 1;
+    $idTransaksi = 'TPEM'.$newNumber;
+
+    // 5. Simpan transaksi (header)
+    $transaksi = TransaksiPembelian::create([
+        'id_transaksi_pembelian' => $idTransaksi,
+        'id_pembeli'             => $user->id_pembeli,
+        'id_alamat'              => $idAlamat,
+        'tgl_transaksi'          => now(),
+        'total_pembayaran'       => $totalBayar,
+        'status_pembayaran'      => 'belum dibayar',
+        'tukar_poin'             => $tukarPoin,
+        // 'no_transaksi' akan diisi setelah dapat id
+    ]);
+
+    // 6. Generate no_transaksi
+    $tahun = date('y', strtotime($transaksi->tgl_transaksi)); // dua digit tahun
+    $bulan = date('m', strtotime($transaksi->tgl_transaksi)); // dua digit bulan
+    preg_match('/(\d+)$/', $transaksi->id_transaksi_pembelian, $match);
+    $angkaUrut = $match[1] ?? '0';
+    $transaksi->no_transaksi = "$tahun.$bulan.$angkaUrut";
+    $transaksi->save();
+
+    // 7. Simpan detail transaksi untuk tiap item di keranjang
+    $lastDetail = DB::table('detail_transaksi_pembelian')
+        ->selectRaw("MAX(CAST(SUBSTRING(id_detail_transaksi_pembelian,5) AS UNSIGNED)) as max_id")
+        ->value('max_id');
+    $counter = $lastDetail ?: 0;
+
+    foreach ($keranjang as $barangId => $item) {
+        $counter++;
+        $idDetail = 'DPEM' . $counter;
+
+        DetailTransaksiPembelian::create([
+            'id_detail_transaksi_pembelian' => $idDetail,
+            'id_transaksi_pembelian'        => $idTransaksi,
+            'id_barang'                     => $barangId,
+            'jml_barang_pembelian'          => $item['jumlah'],
+            'harga_satuan_pembelian'        => $item['harga'],
+            'total_harga_pembelian'         => $item['jumlah'] * $item['harga'],
+        ]);
+
+        // Update status barang
+        $barang = $barangList[$barangId] ?? null;
+        if ($barang) {
+            $barang->status_barang = 'sold out';
+            $barang->save();
+        }
+    }
+
+    // 8. Generate ID Pengiriman
+    $lastShip = Pengiriman::selectRaw(
+        'MAX(CAST(SUBSTRING(id_pengiriman,4) AS UNSIGNED)) as max_id'
+    )->value('max_id');
+    $nextShip    = $lastShip ? $lastShip + 1 : 1;
+    $idPengiriman = 'PGR' . $nextShip;
+
+    $kurirIds  = ['PEG15','PEG2','PEG5'];
+    $gudangIds = ['PEG12','PEG16','PEG20','PEG3'];
+
+    $pool       = $request->metode_pengiriman === 'kurir'
+                ? $kurirIds
+                : $gudangIds;
+    $idPegawai  = $pool[array_rand($pool)];
+
+    Pengiriman::create([
+        'id_pengiriman'          => $idPengiriman,
+        'id_transaksi_pembelian' => $idTransaksi,
+        'id_pegawai'             => $idPegawai,
+        'tgl_pengiriman'         => now(),
+        'status_pengiriman'      => 'diproses',
+        'tipe_pengiriman'        => $request->metode_pengiriman,
+    ]);
+
+    // 9. Kurangi poin pembeli jika ada penukaran poin
+    $pembeli->poin -= $tukarPoin;
+    $pembeli->save();
+    Session::put('user', $pembeli);
+
+    // 10. Bersihkan keranjang
+    Session::forget('keranjang');
+
+    // 11. Redirect ke form upload bukti pembayaran
+    return redirect()
+        ->route('transaksi.bukti', ['id' => $idTransaksi])
+        ->with('alert', 'Silakan upload bukti pembayaran!');
+}
+
 
 
 }

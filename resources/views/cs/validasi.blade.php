@@ -54,7 +54,16 @@
         <tbody>
           @foreach($transaksis as $transaksi)
           <tr class="hover:bg-purple-50 transition">
-            <td class="px-4 py-3 font-semibold">{{ $transaksi->detailTransaksi->first()->barang->nama_barang }}</td>
+             <td class="px-4 py-3 font-semibold">
+                @php
+                    $firstDetail = $transaksi->detailTransaksi->first();
+                @endphp
+                @if($firstDetail && $firstDetail->barang)
+                    {{ $firstDetail->barang->nama_barang }}
+                @else
+                    <span class="text-gray-400 italic">- tidak ada detail/barang -</span>
+                @endif
+            </td>
             <td class="px-4 py-3">{{ $transaksi->pembeli->nama_pembeli }}</td>
             <td class="px-4 py-3">
               {{ $transaksi->alamat && $transaksi->alamat->nama_alamat ? $transaksi->alamat->nama_alamat : 'Gudang' }}

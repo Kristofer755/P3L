@@ -13,14 +13,13 @@ use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\PenitipController;
 use App\Http\Controllers\MobileLoginController;
 use App\Http\Controllers\API\NotifikasiPenitipController;
+use App\Http\Controllers\API\NotifikasiPembeliController;
+use App\Http\Controllers\API\PengirimanController;
 
 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
-
-
-
 
     Route::get('/alamat', [AlamatController::class, 'index']);
     Route::post('/alamat/create', [AlamatController::class, 'store']);
@@ -53,14 +52,6 @@ Route::get('/user', function (Request $request) {
     });
 
 
-
-    // Route::post('/login', [AuthController::class, 'login']);
-    
-
-    // Route::post('/login', [LoginSessionController::class, 'login']);
-    // Route::get('/dashboard', [LoginSessionController::class, 'dashboard'])->middleware('auth');
- 
-
     Route::get('/pegawai', [PegawaiController::class, 'index']);
     Route::post('/pegawai/create', [PegawaiController::class, 'store']);
 
@@ -73,15 +64,12 @@ Route::get('/user', function (Request $request) {
     Route::post('/login', [MobileLoginController::class, 'login']);
     Route::get('/pegawai/kurir-hunter', [PegawaiController::class, 'kurirHunter']);
 
-// // Transaksi Penitipan
-// Route::get('/transaksi-penitipan', [TransaksiPenitipanController::class, 'index']);
-// Route::get('/transaksi-penitipan/{id}', [TransaksiPenitipanController::class, 'show']);
-// Route::post('/transaksi-penitipan/{id}/disiapkan', [TransaksiPenitipanController::class, 'updateStatusDisiapkan']);
-
-// // Detail Transaksi Penitipan
-// Route::get('/detail-transaksi-penitipan', [DetailTransaksiPenitipanController::class, 'index']);
-// Route::get('/detail-transaksi-penitipan/{id}', [DetailTransaksiPenitipanController::class, 'show']);
-
-
 Route::get('/notif-penitip/{id_penitip}', [NotifikasiPenitipController::class, 'getPenitipNotif']);
 Route::post('/notif-penitip/read/{id}', [NotifikasiPenitipController::class, 'markAsRead']);
+
+Route::get('/notif-pembeli/{id_pembeli}', [NotifikasiPembeliController::class, 'getPembeliNotif']);
+Route::post('/notif-pembeli/read/{id}', [NotifikasiPembeliController::class, 'markAsRead']);
+
+Route::get('pengiriman', [PengirimanController::class, 'index']);
+// PATCH /api/pengiriman/{id}
+Route::patch('pengiriman/{id}', [App\Http\Controllers\API\PengirimanController::class, 'update']);
